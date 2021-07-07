@@ -33,7 +33,7 @@ jobs:
       id: cmake_version
       run: echo ::set-output name=VALUE::3.17.0
 
-    - name: Select the osquery version
+    - name: the osquery version
       id: osquery_version
       run: echo ::set-output name=VALUE::4.2.0
 
