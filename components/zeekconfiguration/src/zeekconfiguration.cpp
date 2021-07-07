@@ -116,6 +116,17 @@ const ConfigurationChecker::Constraints kConfigurationConstraints = {
       "",
       REQUIRE_OSQUERY_EXTENSIONS_SOCKET
     }
+  },
+
+  {
+    "excluded_syscall_list",
+
+    {
+      ConfigurationChecker::MemberConstraint::Type::String,
+      true,
+      "",
+      true
+    }
   }
 };
 // clang-format on
@@ -173,6 +184,10 @@ const std::string &ZeekConfiguration::osqueryExtensionsSocket() const {
 
 std::size_t ZeekConfiguration::maxQueuedRowCount() const {
   return d->context.max_queued_row_count;
+}
+
+const std::vector<std::string> &ZeekConfiguration::excludedSyscallList() const {
+  return d->context.excluded_syscall_list;
 }
 
 ZeekConfiguration::ZeekConfiguration(IVirtualDatabase &virtual_database,
@@ -277,6 +292,13 @@ Status ZeekConfiguration::parseConfigurationData(Context &context,
   for (auto i = 0U; i < group_list.Size(); ++i) {
     const auto &group = group_list[i].GetString();
     context.group_list.push_back(group);
+  }
+
+  const auto &excluded_syscall_list = document["excluded_syscall_list"];
+
+  for (auto i = 0U; i < excluded_syscall_list.Size(); ++i) {
+    const auto &syscall = excluded_syscall_list[i].GetString();
+    context.excluded_syscall_list.push_back(syscall);
   }
 
   if (document.HasMember("max_queued_row_count")) {

@@ -1,3 +1,4 @@
+/*
 #include "mockedaudispproducer.h"
 
 namespace zeek {
@@ -40,3 +41,4 @@ MockedAudispProducer::MockedAudispProducer(const std::string &event_buffer)
   d->event_buffer = event_buffer;
 }
 } // namespace zeek
+*/

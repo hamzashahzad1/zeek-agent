@@ -1,4 +1,6 @@
+/*
 #include "mockedauparseinterface.h"
+#include <stdexcept>
 
 namespace zeek {
 struct MockedAuparseInterface::PrivateData final {
@@ -82,3 +84,4 @@ MockedAuparseInterface::MockedAuparseInterface(const FieldList &field_list)
   d->field_list = field_list;
 }
 } // namespace zeek
+*/

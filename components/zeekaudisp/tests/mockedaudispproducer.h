@@ -1,3 +1,4 @@
+/*
 #pragma once
 
 #include "iaudispproducer.h"
@@ -20,3 +21,4 @@ protected:
   MockedAudispProducer(const std::string &socket_path);
 };
 } // namespace zeek
+*/

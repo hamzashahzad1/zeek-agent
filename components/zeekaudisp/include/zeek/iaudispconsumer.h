@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <zeek/status.h>
+#include <zeek/izeekconfiguration.h>
 
 namespace zeek {
 /// \brief Audisp socket consumer (interface)
@@ -23,7 +24,8 @@ public:
       Connect,
       Open,
       OpenAt,
-      Create
+      Create,
+      Write
     };
 
     /// \brief Event type
@@ -142,7 +144,7 @@ public:
   /// \param obj where the created object is stored
   /// \param audisp_socket_path The path to the unix domain socket of Audisp
   /// \return A Status object
-  static Status create(Ref &obj, const std::string &audisp_socket_path);
+  static Status create(Ref &obj, const std::string &audisp_socket_path,IZeekConfiguration &configuration);
 
   /// \brief Constructor
   IAudispConsumer() = default;

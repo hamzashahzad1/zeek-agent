@@ -15,6 +15,8 @@ class FileEventsTablePlugin final : public IVirtualTable {
   std::unique_ptr<PrivateData> d;
 
 public:
+  using FilePaths = std::map<std::int64_t,std::string>;
+
   /// \brief Factory method
   /// \param obj Where the created object is stored
   /// \param configuration An initialized configuration object
@@ -48,7 +50,7 @@ public:
   /// \param audit_event a single Audit event
   /// \return A Status object
   static Status generateRow(Row &row,
-                            const IAudispConsumer::AuditEvent &audit_event);
+                            const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_,std::map<int64_t,int64_t> &fileInodes);
 
 protected:
   /// \brief Constructor

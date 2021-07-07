@@ -6,6 +6,10 @@
 namespace zeek {
 SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
 
+  FileEventsTablePlugin::FilePaths kfilepath;
+  kfilepath[10] = "/var/log/audit"; 
+  std::map<int64_t,int64_t> kfileinode;
+  kfileinode[10] = 1024;
   GIVEN("a valid create syscall audit event") {
 
     // clang-format off
@@ -63,7 +67,7 @@ SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
 
     WHEN("generating a table row") {
       IVirtualTable::Row row;
-      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent);
+      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent,kfilepath,kfileinode);
 
       REQUIRE(status.succeeded());
 
@@ -137,7 +141,7 @@ SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
     // clang-format on
     WHEN("generating a table row") {
       IVirtualTable::Row row;
-      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent);
+      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent,kfilepath,kfileinode);
 
       REQUIRE(status.succeeded());
 
@@ -212,7 +216,7 @@ SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
     // clang-format on
     WHEN("generating a table row") {
       IVirtualTable::Row row;
-      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent);
+      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent,kfilepath,kfileinode);
 
       REQUIRE(status.succeeded());
 
@@ -294,7 +298,7 @@ SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
     // clang-format on
     WHEN("generating a table row") {
       IVirtualTable::Row row;
-      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent);
+      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent,kfilepath,kfileinode);
 
       REQUIRE(status.succeeded());
 

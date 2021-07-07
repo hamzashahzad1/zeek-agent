@@ -19,8 +19,10 @@
 
 namespace zeek {
 struct AudispConsumer::PrivateData final {
+  PrivateData(IZeekConfiguration &configuration_):configuration(configuration_) {}
   IAudispProducer::Ref audisp_producer;
   IAuparseInterface::Ref auparse_interface;
+  IZeekConfiguration &configuration;
 
   std::mutex processed_event_list_mutex;
   AuditEventList processed_event_list;
@@ -30,11 +32,11 @@ struct AudispConsumer::PrivateData final {
 
 Status
 AudispConsumer::createWithProducer(Ref &obj,
-                                   IAudispProducer::Ref audisp_producer) {
+                                   IAudispProducer::Ref audisp_producer,IZeekConfiguration &configuration) {
   obj.reset();
 
   try {
-    auto ptr = new AudispConsumer(std::move(audisp_producer));
+    auto ptr = new AudispConsumer(std::move(audisp_producer),configuration);
     audisp_producer = {};
 
     obj.reset(ptr);
@@ -86,8 +88,8 @@ Status AudispConsumer::getEvents(AuditEventList &event_list) {
   return status;
 }
 
-AudispConsumer::AudispConsumer(IAudispProducer::Ref audisp_producer)
-    : d(new PrivateData) {
+AudispConsumer::AudispConsumer(IAudispProducer::Ref audisp_producer,IZeekConfiguration &configuration)
+    : d(new PrivateData(configuration)) {
   d->audisp_producer = std::move(audisp_producer);
   audisp_producer = {};
 
@@ -121,7 +123,8 @@ void AudispConsumer::auparseCallback(auparse_cb_event_t event_type) {
 
   AuditEvent audit_event;
   std::optional<SyscallRecordData> syscall_data;
-  auto status = parseSyscallRecord(syscall_data, d->auparse_interface);
+  std::vector<std::string> excluded_syscall_list = d->configuration.excludedSyscallList();
+  auto status = parseSyscallRecord(syscall_data, d->auparse_interface,excluded_syscall_list);
   if (!status.succeeded()) {
     d->parser_error = true;
     return;
@@ -220,7 +223,7 @@ void AudispConsumer::auparseCallback(auparse_cb_event_t event_type) {
 }
 
 Status IAudispConsumer::create(Ref &obj,
-                               const std::string &audisp_socket_path) {
+                               const std::string &audisp_socket_path,IZeekConfiguration &configuration) {
   obj.reset();
 
   try {
@@ -232,7 +235,7 @@ Status IAudispConsumer::create(Ref &obj,
       return status;
     }
 
-    return AudispConsumer::createWithProducer(obj, std::move(audisp_producer));
+    return AudispConsumer::createWithProducer(obj, std::move(audisp_producer),configuration);
 
   } catch (const std::bad_alloc &) {
     return Status::failure("Memory allocation failure");
@@ -244,7 +247,7 @@ Status IAudispConsumer::create(Ref &obj,
 
 Status
 AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
-                                   IAuparseInterface::Ref auparse) {
+                                   IAuparseInterface::Ref auparse,std::vector<std::string> &excluded_syscall_list) {
   // clang-format off
   std::unordered_map<int, SyscallRecordData::Type> kNumberToSyscallType = {
     { __NR_execve, SyscallRecordData::Type::Execve },
@@ -261,8 +264,27 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
     { __NR_open, SyscallRecordData::Type::Open },
     { __NR_openat, SyscallRecordData::Type::OpenAt },
     { __NR_creat, SyscallRecordData::Type::Create },
+    { __NR_write, SyscallRecordData::Type::Write },
   };
   // clang-format on
+
+  std::unordered_map<int,std::string> syscallsToExclude = {
+    { __NR_execve, "execve" },
+    { __NR_execveat, "execveat"},
+
+ #ifndef __aarch64__
+    { __NR_fork, "fork"},
+    { __NR_vfork, "vfork"},
+ #endif
+
+    { __NR_clone, "clone" },
+    { __NR_bind, "bind" },
+    { __NR_connect, "connect" },
+    { __NR_open, "open"},
+    { __NR_openat, "openat"},
+    { __NR_creat, "creat" },
+    { __NR_write, "write" },
+  };
 
   data.reset();
 
@@ -280,6 +302,15 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
     if (std::strcmp(field_name, "syscall") == 0) {
       syscall_number = std::strtoll(field_value, nullptr, 10);
 
+      auto syscall_name_it = syscallsToExclude.find(syscall_number);
+      if(syscall_name_it != syscallsToExclude.end()){
+        std::string syscall_name = syscall_name_it->second;
+        for(auto &excluded_syscall:excluded_syscall_list){
+          if(syscall_name==excluded_syscall){
+            return Status::failure(syscall_name+ " is a part of the list of system calls to be excluded");
+          }
+        }
+      }
       auto syscall_type_it = kNumberToSyscallType.find(syscall_number);
       if (syscall_type_it == kNumberToSyscallType.end()) {
         return Status::success();

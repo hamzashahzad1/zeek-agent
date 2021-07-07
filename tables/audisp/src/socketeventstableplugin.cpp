@@ -149,6 +149,7 @@ Status SocketEventsTablePlugin::generateRow(
 
   row["syscall"] = std::move(syscall_name);
   row["pid"] = syscall_data.process_id;
+  // row["pid"] = static_cast<std::int64_t>(999999);
   row["ppid"] = syscall_data.parent_process_id;
   row["auid"] = syscall_data.auid;
   row["uid"] = syscall_data.uid;
@@ -159,7 +160,7 @@ Status SocketEventsTablePlugin::generateRow(
 
   auto fd = std::strtoll(syscall_data.a0.c_str(), nullptr, 16U);
   row["fd"] = static_cast<std::int64_t>(fd);
-
+  // row["fd"] = static_cast<std::int64_t>(999999);
   row["success"] =
       static_cast<std::int64_t>(audit_event.syscall_data.succeeded ? 1 : 0);
 
@@ -175,6 +176,7 @@ Status SocketEventsTablePlugin::generateRow(
       IAudispConsumer::SyscallRecordData::Type::Bind) {
 
     row["local_address"] = sockaddr_data.address;
+    // row["local_address"] = "Hello World";
     row["local_port"] = sockaddr_data.port;
 
     row["remote_address"] = {""};
