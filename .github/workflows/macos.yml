@@ -1,12 +1,12 @@
 name: macOS
 
 on:
-  push:
-    branches:
-      - '*'
+#   push:
+#     branches:
+#       - '*'
 
-    tags:
-      - 'v*'
+#     tags:
+#       - 'v*'
 
   pull_request:
     branches:
