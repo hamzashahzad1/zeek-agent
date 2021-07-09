@@ -135,7 +135,7 @@ jobs:
     - name: Configure the project
       run: |
         export CCACHE_DIR="$(realpath ccache)"
-        ( cd build && -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DZEEK_AGENT_ENABLE_INSTALL:BOOL=ON -DZEEK_AGENT_ENABLE_TESTS:BOOL=ON -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="3.1" ${{ github.repository }}
+        ( cd build && -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DZEEK_AGENT_ENABLE_INSTALL:BOOL=ON -DZEEK_AGENT_ENABLE_TESTS:BOOL=ON -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING=${{ matrix.os.zeek_version }} ${{ github.repository }}/CMakeLists.txt
 
     - name: Build the project
       run: |
