@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-latest]
         build_type: [Release, Debug]
         zeek_version: ['3.0', '3.1']
 
@@ -63,6 +63,10 @@ jobs:
 #     - name: Generate the cache key
 #       id: cache_key
 #       run: echo ::set-output name=VALUE::${{ matrix.os }}_type-${{ matrix.build_type }}_osquery-toolchain-${{ steps.osquery_toolchain_version.outputs.VALUE }}_cmake-${{ steps.cmake_version.outputs.VALUE }}_zeek-version-${{ matrix.zeek_version }}
+
+    - name: Generate the cache key
+      id: cache_key
+      run: echo ::set-output name=VALUE::${{ matrix.os }}_type-${{ matrix.build_type }}_osquery-toolchain-1.1.0_cmake-${{ steps.cmake_version.outputs.VALUE }}_zeek-version-${{ matrix.zeek_version }}
 
     - name: Update the cache (ccache)
       uses: actions/cache@v1.0.3
@@ -123,10 +127,15 @@ jobs:
 #     - name: Link the Zeek Agent source folder inside the osquery source tree
 #       run: ln -s "$(pwd)" "$(realpath osquery)/external/extension_zeek-agent"
 
+#     - name: Configure the project
+#       run: |
+#         export CCACHE_DIR="$(realpath ccache)"
+#         ( cd build && "${{ steps.cmake_installer.outputs.CMAKE_BINARY }}" -G Ninja -DOSQUERY_NO_DEBUG_SYMBOLS:BOOL=true -DOSQUERY_TOOLCHAIN_SYSROOT:PATH="${{ steps.osquery_toolchain_installer.outputs.PATH }}" -DCMAKE_INSTALL_PREFIX:PATH="/usr" -DCMAKE_BUILD_TYPE:STRING="${{ matrix.build_type }}" -DZEEK_AGENT_ENABLE_DOCUMENTATION:BOOL=true -DZEEK_AGENT_ENABLE_INSTALL:BOOL=true -DZEEK_AGENT_ENABLE_TESTS:BOOL=true -DZEEK_AGENT_ENABLE_SANITIZERS:BOOL="${{ steps.sanitizers_settings.outputs.VALUE }}" -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="${{ matrix.zeek_version }}" ../osquery )
+
     - name: Configure the project
       run: |
         export CCACHE_DIR="$(realpath ccache)"
-        ( cd build && "${{ steps.cmake_installer.outputs.CMAKE_BINARY }}" -G Ninja -DOSQUERY_NO_DEBUG_SYMBOLS:BOOL=true -DOSQUERY_TOOLCHAIN_SYSROOT:PATH="${{ steps.osquery_toolchain_installer.outputs.PATH }}" -DCMAKE_INSTALL_PREFIX:PATH="/usr" -DCMAKE_BUILD_TYPE:STRING="${{ matrix.build_type }}" -DZEEK_AGENT_ENABLE_DOCUMENTATION:BOOL=true -DZEEK_AGENT_ENABLE_INSTALL:BOOL=true -DZEEK_AGENT_ENABLE_TESTS:BOOL=true -DZEEK_AGENT_ENABLE_SANITIZERS:BOOL="${{ steps.sanitizers_settings.outputs.VALUE }}" -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="${{ matrix.zeek_version }}" ../osquery )
+        ( cd build && "${{ steps.cmake_installer.outputs.CMAKE_BINARY }}" -G Ninja -DCMAKE_INSTALL_PREFIX:PATH="/usr" -DCMAKE_BUILD_TYPE:STRING="${{ matrix.build_type }}" -DZEEK_AGENT_ENABLE_DOCUMENTATION:BOOL=true -DZEEK_AGENT_ENABLE_INSTALL:BOOL=true -DZEEK_AGENT_ENABLE_TESTS:BOOL=true -DZEEK_AGENT_ENABLE_SANITIZERS:BOOL="${{ steps.sanitizers_settings.outputs.VALUE }}" -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="${{ matrix.zeek_version }}")
 
     - name: Build the project
       run: |
@@ -184,7 +193,7 @@ jobs:
   linux_packaging:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
     needs: linux_build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Download the DEB package from the linux_build job (Release, Zeek 3.0)
@@ -249,7 +258,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Version ${{ github.ref }}
-          draft: true
+          draft: false
           prerelease: false
 
       - name: Upload the Zeek 3.0 .deb package
