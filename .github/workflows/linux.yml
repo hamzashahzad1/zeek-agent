@@ -168,7 +168,7 @@ jobs:
     - name: Build the packages
       run: |
         export DESTDIR="$(realpath install)"
-        ( cd package && cmake --build . --target package -- -v )
+        ( cd package && cmake --build . -- -v )
 
     - name: Locate the packages
       id: package_locations
