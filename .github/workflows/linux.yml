@@ -141,9 +141,6 @@ jobs:
       run: |
         export CCACHE_DIR="$(realpath ccache)"
         ( cd build && cmake --build . -j2)
-        nohup ./zeek-agent &
-        bg_pid=$!
-        echo "${bg_pid}" > zeek-agent.pid
 
     - name: Build the documentation
       run: ( cd build && cmake --build . --target doxygen -- -v )
