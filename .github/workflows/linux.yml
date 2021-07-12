@@ -139,6 +139,8 @@ jobs:
 
     - name: Build the project
       run: |
+        echo "Clang Version: "
+        clang --version
         export CCACHE_DIR="$(realpath ccache)"
         ( cd build && cmake --build .)
 
