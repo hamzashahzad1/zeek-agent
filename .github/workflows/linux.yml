@@ -140,7 +140,7 @@ jobs:
     - name: Build the project
       run: |
         export CCACHE_DIR="$(realpath ccache)"
-        ( cd build && cmake --build . -j2)
+        ( cd build && cmake --build .)
 
     - name: Build the documentation
       run: ( cd build && cmake --build . --target doxygen -- -v )
