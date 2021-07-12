@@ -169,10 +169,13 @@ jobs:
       id: listing
       run: |
         cd /home/runner/work/zeek-agent/zeek-agent/build
+        echo "Following Items are present in the build folder"
         ls
         cd /home/runner/work/zeek-agent/zeek-agent/install
+        echo "Following Items are present in the install folder"
         ls
         cd /home/runner/work/zeek-agent/zeek-agent/package
+        echo "Following Items are present in the package folder"
         ls
     
     
