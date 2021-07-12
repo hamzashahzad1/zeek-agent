@@ -165,6 +165,17 @@ jobs:
         export ZEEK_AGENT_INSTALL_PATH="$(realpath build)"
         ( cd package && ${{ steps.cmake_installer.outputs.CMAKE_BINARY }} -G Ninja -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="3.1" -DZEEK_AGENT_INSTALL_PATH:PATH="${ZEEK_AGENT_INSTALL_PATH}" ../ )
 
+    - name: List items
+      id: listing
+      run: |
+        cd /home/runner/work/zeek-agent/zeek-agent/build
+        ls
+        cd /home/runner/work/zeek-agent/zeek-agent/install
+        ls
+        cd /home/runner/work/zeek-agent/zeek-agent/package
+        ls
+    
+    
     - name: Build the packages
       run: |
         export DESTDIR="$(realpath install)"
