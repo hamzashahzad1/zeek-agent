@@ -177,7 +177,8 @@ jobs:
         cd /home/runner/work/zeek-agent/zeek-agent/package
         echo "Following Items are present in the package folder"
         ls
-    
+        echo "Clang Version: "
+        clang --version
     
     - name: Build the packages
       run: |
