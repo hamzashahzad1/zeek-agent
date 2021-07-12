@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04]
         build_type: [Release]
         zeek_version: ['3.1']
 
@@ -31,7 +31,7 @@ jobs:
 
     - name: Select the CMake version
       id: cmake_version
-      run: echo ::set-output name=VALUE::3.17.0
+      run: echo ::set-output name=VALUE::3.16.3
 
 #     - name: Select the osquery version
 #       id: osquery_version
@@ -212,7 +212,7 @@ jobs:
   linux_packaging:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
     needs: linux_build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Download the DEB package from the linux_build job (Release, Zeek 3.0)
