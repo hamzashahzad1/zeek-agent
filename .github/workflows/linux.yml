@@ -141,8 +141,8 @@ jobs:
       run: |
         echo "Clang Version: "
         clang --version
-        sudo update-alternatives --set cc /usr/bin/clang
-        sudo update-alternatives --set c++ /usr/bin/clang++
+        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-10.0 100
+        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10.0 100
         export CCACHE_DIR="$(realpath ccache)"
         ( cd build && cmake --build .)
 
