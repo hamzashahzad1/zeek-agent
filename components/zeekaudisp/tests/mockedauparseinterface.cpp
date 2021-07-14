@@ -1,4 +1,5 @@
 #include "mockedauparseinterface.h"
+#include <stdexcept>
 
 namespace zeek {
 struct MockedAuparseInterface::PrivateData final {
@@ -42,7 +43,7 @@ int MockedAuparseInterface::nextField() {
 
 const char *MockedAuparseInterface::getFieldName() {
   if (d->current_field >= d->field_list.size()) {
-    throw std::runtime_error("Reached the end of the field list");
+    throw stdexcept::runtime_error("Reached the end of the field list");
   }
 
   const auto &field_desc = d->field_list.at(d->current_field);
@@ -53,7 +54,7 @@ const char *MockedAuparseInterface::getFieldName() {
 
 const char *MockedAuparseInterface::getFieldStr() {
   if (d->current_field >= d->field_list.size()) {
-    throw std::runtime_error("Reached the end of the field list");
+    throw stdexcept::runtime_error("Reached the end of the field list");
   }
 
   const auto &field_desc = d->field_list.at(d->current_field);
