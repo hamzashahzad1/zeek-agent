@@ -134,6 +134,8 @@ jobs:
 
     - name: Configure the project
       run: |
+        sudo apt-get update -y
+        sudo apt-get install -y libunwind-dev
         sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
         sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
         export CCACHE_DIR="$(realpath ccache)"
