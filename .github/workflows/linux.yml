@@ -158,7 +158,7 @@ jobs:
         ( cd build && cmake --build .)
 
     - name: Build the documentation
-      run: ( cd build && cmake --build . --target doxygen )
+      run: ( cd build && cmake --build . --target doxygen -- -v )
 
     - name: Run the tests
       run: |
