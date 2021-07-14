@@ -134,8 +134,8 @@ jobs:
 
     - name: Configure the project
       run: |
-        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang
-        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++
+        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
+        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
         export CCACHE_DIR="$(realpath ccache)"
         ( cd build && ${{ steps.cmake_installer.outputs.CMAKE_BINARY }} -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DZEEK_AGENT_ENABLE_INSTALL:BOOL=ON -DZEEK_AGENT_ENABLE_TESTS:BOOL=ON -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="3.1" ../ )
 
