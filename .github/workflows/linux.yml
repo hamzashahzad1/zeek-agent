@@ -136,6 +136,7 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install -y libunwind-dev
+        sudo apt-get install -y libssl-dev
         sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
         sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
         export CCACHE_DIR="$(realpath ccache)"
@@ -177,7 +178,7 @@ jobs:
 
     - name: Configure the packaging project
       run: |
-        export ZEEK_AGENT_INSTALL_PATH="$(realpath build)"
+        export ZEEK_AGENT_INSTALL_PATH="$(realpath install)"
         ( cd package && ${{ steps.cmake_installer.outputs.CMAKE_BINARY }} -G Ninja -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="3.1" -DZEEK_AGENT_INSTALL_PATH:PATH="${ZEEK_AGENT_INSTALL_PATH}" ../ )
 
     - name: List items
