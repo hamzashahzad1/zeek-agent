@@ -158,17 +158,17 @@ jobs:
         ( cd build && cmake --build .)
 
     - name: Build the documentation
-      run: ( cd build && cmake --build . --target doxygen -- -v )
+      run: ( cd build && cmake --build . --target doxygen )
 
     - name: Run the tests
       run: |
         export ASAN_OPTIONS=detect_container_overflow=0
-        ( cd build && cmake --build . --target zeek_agent_tests -- -v )
+        ( cd build && cmake --build . --target zeek_agent_tests )
 
     - name: Install the project
       run: |
         export DESTDIR="$(realpath install)"
-        ( cd build && cmake --build . --target install -- -v )
+        ( cd build && cmake --build . --target install )
 
 #     - name: Configure the packaging project
 #       run: |
@@ -198,7 +198,7 @@ jobs:
     - name: Build the packages
       run: |
         export DESTDIR="$(realpath install)"
-        ( cd package && cmake --build . --target package -- -v )
+        ( cd package && cmake --build . --target zeek-agent )
 
     - name: Locate the packages
       id: package_locations
