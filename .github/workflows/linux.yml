@@ -179,7 +179,7 @@ jobs:
     - name: Configure the packaging project
       run: |
         export ZEEK_AGENT_INSTALL_PATH="$(realpath install)"
-        ( cd build && ${{ steps.cmake_installer.outputs.CMAKE_BINARY }} -G Ninja -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="3.1" -DZEEK_AGENT_INSTALL_PATH:PATH="${ZEEK_AGENT_INSTALL_PATH}" ../ )
+        ( cd package && ${{ steps.cmake_installer.outputs.CMAKE_BINARY }} -G Ninja -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="3.1" -DZEEK_AGENT_INSTALL_PATH:PATH="${ZEEK_AGENT_INSTALL_PATH}" ../ )
 
 #     - name: List items
 #       id: listing
@@ -234,9 +234,9 @@ jobs:
         cd /home/runner/work/zeek-agent/zeek-agent/package
         echo "Following Items are present in the package folder"
         ls
-        echo ::set-output name=DEB_PACKAGE_PATH::$(ls build/*.deb)
-        echo ::set-output name=RPM_PACKAGE_PATH::$(ls build/*.rpm)
-        echo ::set-output name=TARGZ_PACKAGE_PATH::$(ls build/*.tar.gz)
+        echo ::set-output name=DEB_PACKAGE_PATH::$(ls package/*.deb)
+        echo ::set-output name=RPM_PACKAGE_PATH::$(ls package/*.rpm)
+        echo ::set-output name=TARGZ_PACKAGE_PATH::$(ls package/*.tar.gz)
 
     - name: Store the .deb package artifact
       uses: actions/upload-artifact@v1
