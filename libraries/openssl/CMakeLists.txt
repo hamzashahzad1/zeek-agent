@@ -131,8 +131,8 @@ function(zeekAgentLibrariesOpenSSL)
         thirdparty_zlib
     )
 
-    set(lib_folder_name "lib")
-    set(lib_extension "lib")
+    set(lib_folder_name "lib64")
+    set(lib_extension "a")
 
   else()
     message(FATAL_ERROR "Unsupported system")
