@@ -195,8 +195,29 @@ jobs:
         ls
         echo "Clang Version: "
         clang --version
-        echo "libssl.a Directory:"
-        cd /home/runner/work/zeek-agent/zeek-agent/package/libraries/openssl/install/lib64/
+        echo "libraries of build folder"
+        cd /home/runner/work/zeek-agent/zeek-agent/build/libraries
+        ls
+        echo "libraries of package folder"
+        cd /home/runner/work/zeek-agent/zeek-agent/package/libraries
+        ls
+        echo "openssl of build folder"
+        cd /home/runner/work/zeek-agent/zeek-agent/build/libraries/openssl
+        ls
+        echo "openssl of package folder"
+        cd /home/runner/work/zeek-agent/zeek-agent/package/libraries/openssl
+        ls
+        echo "install of build folder"
+        cd /home/runner/work/zeek-agent/zeek-agent/build/libraries/openssl/install
+        ls
+        echo "install of package folder"
+        cd /home/runner/work/zeek-agent/zeek-agent/package/libraries/openssl/install
+        ls
+        echo "lib64 of build folder"
+        cd /home/runner/work/zeek-agent/zeek-agent/build/libraries/openssl/install/lib64
+        ls
+        echo "lib64 of package folder"
+        cd /home/runner/work/zeek-agent/zeek-agent/package/libraries/openssl/install/lib64
         ls
     
     - name: Build the packages
