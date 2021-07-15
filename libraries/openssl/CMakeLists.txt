@@ -172,6 +172,3 @@ function(zeekAgentLibrariesOpenSSL)
 endfunction()
 
 zeekAgentLibrariesOpenSSL()
-set(CPACK_GENERATOR ZIP)
-set(CPACK_INSTALL_CMAKE_CONFIGURATIONS Release)
-include(CPack)
