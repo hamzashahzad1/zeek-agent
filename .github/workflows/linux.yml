@@ -195,6 +195,9 @@ jobs:
         ls
         echo "Clang Version: "
         clang --version
+        echo "libssl.a Directory:"
+        cd /libraries/openssl/install/lib64/
+        ls
     
     - name: Build the packages
       run: |
