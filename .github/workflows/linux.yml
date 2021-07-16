@@ -229,6 +229,7 @@ jobs:
       id: package_locations
       run: |
         sudo apt-get install zip
+        cd /home/runner/work/zeek-agent/zeek-agent/build
         mkdir temp
         cp zeek-agent-0.1.1-Linux.zip temp
         cd temp
