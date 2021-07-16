@@ -228,6 +228,13 @@ jobs:
     - name: Locate the packages
       id: package_locations
       run: |
+        sudo apt-get install zip
+        mkdir temp
+        cp zeek-agent-0.1.1-Linux.zip temp
+        cd temp
+        unzip zeek-agent-0.1.1-Linux.zip
+        echo "The following files are present inside the zip:"
+        ls
         cd /home/runner/work/zeek-agent/zeek-agent/build
         echo "Following Items are present in the build folder"
         ls
