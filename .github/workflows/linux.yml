@@ -256,6 +256,7 @@ jobs:
       id: package_locations
       run: |
         echo ::set-output name=DEB_PACKAGE_PATH::$(ls *.zip)
+        ls
         cd /home/runner/work/zeek-agent/zeek-agent/build
         echo "Following Items are present in the build folder"
         ls
