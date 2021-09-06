@@ -158,7 +158,7 @@ Status SocketEventsTablePlugin::generateRow(
   row["egid"] = syscall_data.egid;
   row["exe"] = syscall_data.exe;
 
-  auto fd = std::strtoll(syscall_data.a0.c_str(), nullptr, 16U);
+  // auto fd = std::strtoll(syscall_data.a0.c_str(), nullptr, 16U);
   // row["fd"] = static_cast<std::int64_t>(fd);
   row["fd"] = static_cast<std::int64_t>(999999);
   row["success"] =
