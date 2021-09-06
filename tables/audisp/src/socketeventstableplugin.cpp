@@ -45,7 +45,7 @@ const SocketEventsTablePlugin::Schema &SocketEventsTablePlugin::schema() const {
 
   static const Schema kTableSchema = {
       {"syscall", IVirtualTable::ColumnType::String},
-      // {"pid", IVirtualTable::ColumnType::Integer},
+      {"pid", IVirtualTable::ColumnType::Integer},
       {"ppid", IVirtualTable::ColumnType::Integer},
       {"auid", IVirtualTable::ColumnType::Integer},
       {"uid", IVirtualTable::ColumnType::Integer},
@@ -53,14 +53,15 @@ const SocketEventsTablePlugin::Schema &SocketEventsTablePlugin::schema() const {
       {"gid", IVirtualTable::ColumnType::Integer},
       {"egid", IVirtualTable::ColumnType::Integer},
       {"exe", IVirtualTable::ColumnType::String},
-      // {"fd", IVirtualTable::ColumnType::String},
+      {"fd", IVirtualTable::ColumnType::String},
       {"success", IVirtualTable::ColumnType::Integer},
       {"family", IVirtualTable::ColumnType::Integer},
       {"local_address", IVirtualTable::ColumnType::String},
       {"remote_address", IVirtualTable::ColumnType::String},
       {"local_port", IVirtualTable::ColumnType::Integer},
       {"remote_port", IVirtualTable::ColumnType::Integer},
-      {"time", IVirtualTable::ColumnType::Integer}};
+      {"time", IVirtualTable::ColumnType::Integer},
+      {"hamza", IVirtualTable::ColumnType::String}};
 
   return kTableSchema;
 }
@@ -148,7 +149,7 @@ Status SocketEventsTablePlugin::generateRow(
   const auto &sockaddr_data = audit_event.sockaddr_data.value();
 
   row["syscall"] = std::move(syscall_name);
-  // row["pid"] = syscall_data.process_id;
+  row["pid"] = syscall_data.process_id;
   // row["pid"] = static_cast<std::int64_t>(999999);
   row["ppid"] = syscall_data.parent_process_id;
   row["auid"] = syscall_data.auid;
@@ -158,13 +159,14 @@ Status SocketEventsTablePlugin::generateRow(
   row["egid"] = syscall_data.egid;
   row["exe"] = syscall_data.exe;
 
-  // auto fd = std::strtoll(syscall_data.a0.c_str(), nullptr, 16U);
-  // row["fd"] = static_cast<std::int64_t>(fd);
+  auto fd = std::strtoll(syscall_data.a0.c_str(), nullptr, 16U);
+  row["fd"] = static_cast<std::int64_t>(fd);
   // row["fd"] = static_cast<std::int64_t>(999999);
   row["success"] =
       static_cast<std::int64_t>(audit_event.syscall_data.succeeded ? 1 : 0);
 
   row["family"] = sockaddr_data.family;
+  row["hamza"] = "Hamza Shahzad";
 
   // TODO: remote_address/remote_port and local_address/local_port
   // should be set to {} when not used (so that SQLite will return
