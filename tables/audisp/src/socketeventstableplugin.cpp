@@ -60,8 +60,7 @@ const SocketEventsTablePlugin::Schema &SocketEventsTablePlugin::schema() const {
       {"remote_address", IVirtualTable::ColumnType::String},
       {"local_port", IVirtualTable::ColumnType::Integer},
       {"remote_port", IVirtualTable::ColumnType::Integer},
-      {"time", IVirtualTable::ColumnType::Integer},
-      {"hamza", IVirtualTable::ColumnType::String}};
+      {"time", IVirtualTable::ColumnType::Integer}};
 
   return kTableSchema;
 }
@@ -166,7 +165,6 @@ Status SocketEventsTablePlugin::generateRow(
       static_cast<std::int64_t>(audit_event.syscall_data.succeeded ? 1 : 0);
 
   row["family"] = sockaddr_data.family;
-  row["hamza"] = "Hamza Shahzad";
 
   // TODO: remote_address/remote_port and local_address/local_port
   // should be set to {} when not used (so that SQLite will return
