@@ -251,6 +251,7 @@ Status FileEventsTablePlugin::generateRow(
   case IAudispConsumer::SyscallRecordData::Type::Clone:
   case IAudispConsumer::SyscallRecordData::Type::Bind:
   case IAudispConsumer::SyscallRecordData::Type::Connect:
+  default:
     return Status::success();
   }
 

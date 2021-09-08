@@ -169,6 +169,7 @@ Status ProcessEventsTablePlugin::generateRow(
   case IAudispConsumer::SyscallRecordData::Type::Open:
   case IAudispConsumer::SyscallRecordData::Type::OpenAt:
   case IAudispConsumer::SyscallRecordData::Type::Create:
+  default:
     return Status::success();
   }
 
