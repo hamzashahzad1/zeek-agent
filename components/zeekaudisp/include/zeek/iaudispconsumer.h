@@ -23,7 +23,8 @@ public:
       Connect,
       Open,
       OpenAt,
-      Create
+      Create,
+      Write
     };
 
     /// \brief Event type
