@@ -261,7 +261,6 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
     { __NR_open, SyscallRecordData::Type::Open },
     { __NR_openat, SyscallRecordData::Type::OpenAt },
     { __NR_creat, SyscallRecordData::Type::Create },
-    { __NR_write, SyscallRecordData::Type::Write },
   };
   // clang-format on
 

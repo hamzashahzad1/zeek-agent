@@ -5,12 +5,6 @@
         "memory_resource": "cpp",
         "mutex": "cpp",
         "shared_mutex": "cpp",
-        "thread": "cpp",
-        "fstream": "cpp",
-        "iosfwd": "cpp",
-        "istream": "cpp",
-        "limits": "cpp",
-        "sstream": "cpp",
-        "streambuf": "cpp"
+        "thread": "cpp"
     }
 }
