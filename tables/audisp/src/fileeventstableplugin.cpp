@@ -209,39 +209,7 @@ Status FileEventsTablePlugin::generateRow(
     break;
   }
   case IAudispConsumer::SyscallRecordData::Type::Write: {
-    if (!audit_event.cwd_data.has_value()) {
-      return Status::failure("Missing an AUDIT_CWD record from a file event");
-    }
-    if (!audit_event.path_data.has_value()) {
-      return Status::failure("Missing an AUDIT_PATH record from a file event");
-    }
     syscall_name = "write";
-
-    std::string working_dir_path;
-    std::string file_path;
-    const auto &path_record = audit_event.path_data.value();
-    const auto &cwd_record = audit_event.cwd_data.value();
-
-    if (path_record.size() == 1) {
-      working_dir_path = cwd_record;
-      file_path = path_record.at(0).path;
-      inode = path_record.at(0).inode;
-
-    } else if (path_record.size() == 2) {
-      working_dir_path = path_record.at(0).path;
-      file_path = path_record.at(1).path;
-      inode = path_record.at(1).inode;
-
-    } else if (path_record.size() == 3) {
-      working_dir_path = cwd_record;
-      file_path = path_record.at(0).path;
-      inode = path_record.at(0).inode;
-
-    } else {
-      return Status::failure(
-          "Wrong number of path records for open/openat syscall event");
-    }
-    full_path = CombinePaths(working_dir_path, file_path);
     break;
   }
   case IAudispConsumer::SyscallRecordData::Type::Execve:
