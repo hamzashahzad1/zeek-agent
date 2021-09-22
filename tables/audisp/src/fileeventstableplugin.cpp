@@ -210,6 +210,7 @@ Status FileEventsTablePlugin::generateRow(
   }
   case IAudispConsumer::SyscallRecordData::Type::Write: {
     syscall_name = "write";
+    full_path = audit_event.syscall_data.exe;
     break;
   }
   case IAudispConsumer::SyscallRecordData::Type::Execve:
