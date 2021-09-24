@@ -6,7 +6,7 @@
 namespace zeek {
 SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
 
-  FilePaths kfilepath;
+  FileEventsTablePluggin::FilePaths kfilepath;
   kfilepath[10] = "/var/log/audit"; 
   GIVEN("a valid create syscall audit event") {
 
