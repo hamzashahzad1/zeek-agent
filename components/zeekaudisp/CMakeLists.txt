@@ -35,6 +35,7 @@ function(zeekAgentComponentsAudisp)
       zeek_agent_cxx_settings
 
     PUBLIC
+      zeek_configuration
       zeek_utils
       thirdparty_audit
       ${CMAKE_THREAD_LIBS_INIT}
