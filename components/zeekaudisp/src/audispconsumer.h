@@ -11,6 +11,7 @@
 
 #include <zeek/iaudispconsumer.h>
 
+
 namespace zeek {
 /// \brief Audisp socket consumer (implementation)
 class AudispConsumer final : public IAudispConsumer {
@@ -23,7 +24,7 @@ public:
   /// \param audisp_producer An initialized Audisp socket reader
   /// \return A Status object
   static Status createWithProducer(Ref &obj,
-                                   IAudispProducer::Ref audisp_producer);
+                                   IAudispProducer::Ref audisp_producer,IZeekConfiguration &configuration);
 
   /// \brief Destructor
   virtual ~AudispConsumer() override;
@@ -40,7 +41,7 @@ public:
 protected:
   /// \brief Constructor
   /// \param audisp_producer An initialized Audisp socket reader
-  AudispConsumer(IAudispProducer::Ref audisp_producer);
+  AudispConsumer(IAudispProducer::Ref audisp_producer,IZeekConfiguration &configuration);
 
 private:
   /// \brief Callback dispatcher for libauparse

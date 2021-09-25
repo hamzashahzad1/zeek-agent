@@ -19,8 +19,10 @@
 
 namespace zeek {
 struct AudispConsumer::PrivateData final {
+  PrivateData(IZeekConfiguration &configuration_):configuration(configuration_) {}
   IAudispProducer::Ref audisp_producer;
   IAuparseInterface::Ref auparse_interface;
+  IZeekConfiguration &configuration;
 
   std::mutex processed_event_list_mutex;
   AuditEventList processed_event_list;
@@ -30,11 +32,11 @@ struct AudispConsumer::PrivateData final {
 
 Status
 AudispConsumer::createWithProducer(Ref &obj,
-                                   IAudispProducer::Ref audisp_producer) {
+                                   IAudispProducer::Ref audisp_producer,IZeekConfiguration &configuration) {
   obj.reset();
 
   try {
-    auto ptr = new AudispConsumer(std::move(audisp_producer));
+    auto ptr = new AudispConsumer(std::move(audisp_producer),configuration);
     audisp_producer = {};
 
     obj.reset(ptr);
@@ -86,8 +88,8 @@ Status AudispConsumer::getEvents(AuditEventList &event_list) {
   return status;
 }
 
-AudispConsumer::AudispConsumer(IAudispProducer::Ref audisp_producer)
-    : d(new PrivateData) {
+AudispConsumer::AudispConsumer(IAudispProducer::Ref audisp_producer,IZeekConfiguration &configuration)
+    : d(new PrivateData(configuration)) {
   d->audisp_producer = std::move(audisp_producer);
   audisp_producer = {};
 
@@ -220,7 +222,7 @@ void AudispConsumer::auparseCallback(auparse_cb_event_t event_type) {
 }
 
 Status IAudispConsumer::create(Ref &obj,
-                               const std::string &audisp_socket_path) {
+                               const std::string &audisp_socket_path,IZeekConfiguration &configuration) {
   obj.reset();
 
   try {
@@ -232,7 +234,7 @@ Status IAudispConsumer::create(Ref &obj,
       return status;
     }
 
-    return AudispConsumer::createWithProducer(obj, std::move(audisp_producer));
+    return AudispConsumer::createWithProducer(obj, std::move(audisp_producer),configuration);
 
   } catch (const std::bad_alloc &) {
     return Status::failure("Memory allocation failure");

@@ -221,7 +221,7 @@ Status FileEventsTablePlugin::generateRow(
     if(itr!= filepaths_.end()){
       full_path = itr->second;
     } else{
-      full_path = "Path Not Found";
+      full_path = "Not Found";
     }
     break;
   }

@@ -104,7 +104,7 @@ AudispService::AudispService(IVirtualDatabase &virtual_database,
     : d(new PrivateData(virtual_database, configuration, logger)) {
 
   auto status =
-      zeek::IAudispConsumer::create(d->audisp_consumer, kAudispSocketPath);
+      zeek::IAudispConsumer::create(d->audisp_consumer, kAudispSocketPath,d->configuration);
 
   if (!status.succeeded()) {
     throw status;
