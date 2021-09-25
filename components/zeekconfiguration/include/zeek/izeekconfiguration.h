@@ -53,6 +53,10 @@ public:
   ///         that is waiting to be queried
   virtual std::size_t maxQueuedRowCount() const = 0;
 
+  /// \brief Returns a list of syscalls to be considered
+  /// \return Returns the configured syscall list
+  virtual const std::vector<std::string> &syscallList() const = 0;
+
   IZeekConfiguration(const IZeekConfiguration &) = delete;
   IZeekConfiguration &operator=(const IZeekConfiguration &) = delete;
 };

@@ -153,6 +153,7 @@ Status FileEventsTablePlugin::generateRow(
   std::string syscall_name;
   std::string full_path;
   std::int64_t inode;
+  inode = -1;
   switch (audit_event.syscall_data.type) {
   case IAudispConsumer::SyscallRecordData::Type::Open:
   case IAudispConsumer::SyscallRecordData::Type::OpenAt: {
