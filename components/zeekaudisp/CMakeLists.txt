@@ -42,23 +42,23 @@ function(zeekAgentComponentsAudisp)
       ${CMAKE_DL_LIBS}
   )
 
-  generateZeekAgentTest(
-    SOURCE_TARGET
-      "${PROJECT_NAME}"
+  # generateZeekAgentTest(
+  #   SOURCE_TARGET
+  #     "${PROJECT_NAME}"
 
-    SOURCES
-      tests/main.cpp
+  #   SOURCES
+  #     tests/main.cpp
 
-      tests/mockedauparseinterface.h
-      tests/mockedauparseinterface.cpp
+  #     tests/mockedauparseinterface.h
+  #     tests/mockedauparseinterface.cpp
 
-      tests/audit_utils.cpp
-      tests/audisp_records.cpp
-      tests/audisp_events.cpp
+  #     tests/audit_utils.cpp
+  #     tests/audisp_records.cpp
+  #     tests/audisp_events.cpp
 
-      tests/mockedaudispproducer.h
-      tests/mockedaudispproducer.cpp
-  )
+  #     tests/mockedaudispproducer.h
+  #     tests/mockedaudispproducer.cpp
+  # )
 endfunction()
 
 zeekAgentComponentsAudisp()
