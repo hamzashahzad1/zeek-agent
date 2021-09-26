@@ -1,3 +1,4 @@
+/*
 #include "iauparseinterface.h"
 
 #include <memory>
@@ -34,3 +35,4 @@ protected:
   MockedAuparseInterface(const FieldList &field_list);
 };
 } // namespace zeek
+*/

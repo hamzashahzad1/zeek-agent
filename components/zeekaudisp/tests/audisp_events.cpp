@@ -1,3 +1,4 @@
+/*
 #include "audispconsumer.h"
 #include "mockedaudispproducer.h"
 
@@ -7,6 +8,7 @@
 #include <catch2/catch.hpp>
 
 namespace zeek {
+
 SCENARIO("AudispConsumer event parsers", "[AudispConsumer]") {
   GIVEN("a full execve event") {
     // clang-format off
@@ -124,3 +126,4 @@ SCENARIO("AudispConsumer event parsers", "[AudispConsumer]") {
   }
 }
 } // namespace zeek
+*/

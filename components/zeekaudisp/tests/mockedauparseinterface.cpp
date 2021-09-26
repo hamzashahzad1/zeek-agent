@@ -1,3 +1,4 @@
+/*
 #include "mockedauparseinterface.h"
 #include <stdexcept>
 
@@ -83,3 +84,4 @@ MockedAuparseInterface::MockedAuparseInterface(const FieldList &field_list)
   d->field_list = field_list;
 }
 } // namespace zeek
+*/
