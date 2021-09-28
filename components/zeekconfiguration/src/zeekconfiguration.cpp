@@ -119,7 +119,7 @@ const ConfigurationChecker::Constraints kConfigurationConstraints = {
   },
 
   {
-    "syscall_list",
+    "excluded_syscall_list",
 
     {
       ConfigurationChecker::MemberConstraint::Type::String,
@@ -186,8 +186,8 @@ std::size_t ZeekConfiguration::maxQueuedRowCount() const {
   return d->context.max_queued_row_count;
 }
 
-const std::vector<std::string> &ZeekConfiguration::syscallList() const {
-  return d->context.syscall_list;
+const std::vector<std::string> &ZeekConfiguration::excludedSyscallList() const {
+  return d->context.excluded_syscall_list;
 }
 
 ZeekConfiguration::ZeekConfiguration(IVirtualDatabase &virtual_database,
@@ -294,11 +294,11 @@ Status ZeekConfiguration::parseConfigurationData(Context &context,
     context.group_list.push_back(group);
   }
 
-  const auto &syscall_list = document["syscall_list"];
+  const auto &excluded_syscall_list = document["excluded_syscall_list"];
 
-  for (auto i = 0U; i < syscall_list.Size(); ++i) {
-    const auto &syscall = syscall_list[i].GetString();
-    context.syscall_list.push_back(syscall);
+  for (auto i = 0U; i < excluded_syscall_list.Size(); ++i) {
+    const auto &syscall = excluded_syscall_list[i].GetString();
+    context.excluded_syscall_list.push_back(syscall);
   }
 
   if (document.HasMember("max_queued_row_count")) {

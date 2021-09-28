@@ -61,7 +61,7 @@ public:
   /// \param auparse The auparse library interface
   /// \return A Status object
   static Status parseSyscallRecord(std::optional<SyscallRecordData> &data,
-                                   IAuparseInterface::Ref auparse);
+                                   IAuparseInterface::Ref auparse,std::vector<std::string> &excluded_syscall_list);
 
   /// \brief Parses an EXECVE record
   /// \param data Where the parsed data is stored

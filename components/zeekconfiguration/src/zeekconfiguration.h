@@ -38,9 +38,9 @@ public:
   ///         that is waiting to be queried
   virtual std::size_t maxQueuedRowCount() const override;
 
-  /// \brief Returns a list of syscalls to be considered
-  /// \return Returns the configured syscall list
-  virtual const std::vector<std::string> &syscallList() const override;
+  /// \brief Returns a list of syscalls to be excluded
+  /// \return Returns the syscall list to be excluded
+  virtual const std::vector<std::string> &excludedSyscallList() const override;
 
 protected:
   /// \brief Constructor
@@ -99,8 +99,8 @@ public:
     /// waiting to be queried
     std::size_t max_queued_row_count;
 
-    /// \brief List of System calls to store
-    std::vector<std::string> syscall_list;
+    /// \brief List of System calls to exclude
+    std::vector<std::string> excluded_syscall_list;
   };
 
   /// \brief Parses the given configuration data in JSON format

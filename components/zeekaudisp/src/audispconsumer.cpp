@@ -123,7 +123,8 @@ void AudispConsumer::auparseCallback(auparse_cb_event_t event_type) {
 
   AuditEvent audit_event;
   std::optional<SyscallRecordData> syscall_data;
-  auto status = parseSyscallRecord(syscall_data, d->auparse_interface);
+  std::vector<std::string> excluded_syscall_list = d->configuration.excludedSyscallList();
+  auto status = parseSyscallRecord(syscall_data, d->auparse_interface,excluded_syscall_list);
   if (!status.succeeded()) {
     d->parser_error = true;
     return;
@@ -246,7 +247,7 @@ Status IAudispConsumer::create(Ref &obj,
 
 Status
 AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
-                                   IAuparseInterface::Ref auparse) {
+                                   IAuparseInterface::Ref auparse,std::vector<std::string> &excluded_syscall_list) {
   // clang-format off
   std::unordered_map<int, SyscallRecordData::Type> kNumberToSyscallType = {
     { __NR_execve, SyscallRecordData::Type::Execve },
@@ -267,6 +268,24 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
   };
   // clang-format on
 
+  std::unordered_map<int,std::string> syscallsToExclude = {
+    { __NR_execve, "execve" },
+    { __NR_execveat, "execveat"},
+
+ #ifndef __aarch64__
+    { __NR_fork, "fork"},
+    { __NR_vfork, "vfork"},
+ #endif
+
+    { __NR_clone, "clone" },
+    { __NR_bind, "bind" },
+    { __NR_connect, "connect" },
+    { __NR_open, "open"},
+    { __NR_openat, "openat"},
+    { __NR_creat, "creat" },
+    { __NR_write, "write" },
+  };
+
   data.reset();
 
   SyscallRecordData output;
@@ -283,6 +302,15 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
     if (std::strcmp(field_name, "syscall") == 0) {
       syscall_number = std::strtoll(field_value, nullptr, 10);
 
+      auto syscall_name_it = syscallsToExclude.find(syscall_number);
+      if(syscall_name_it != syscallsToExclude.end()){
+        std::string syscall_name = syscall_name_it->second;
+        for(auto &excluded_syscall:excluded_syscall_list){
+          if(syscall_name==excluded_syscall){
+            return Status::failure(syscall_name+ " is a part of the list of system calls to be excluded");
+          }
+        }
+      }
       auto syscall_type_it = kNumberToSyscallType.find(syscall_number);
       if (syscall_type_it == kNumberToSyscallType.end()) {
         return Status::success();
