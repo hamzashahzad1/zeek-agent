@@ -58,12 +58,11 @@ TEST_CASE("Reading configuration files", "[ZeekConfiguration]") {
 
     "osquery_extensions_socket": "/test/path",
     "max_queued_row_count": 1337,
-
     "excluded_syscall_list": [
       "write",
       "execve",
       "connect"
-    ],
+    ]
   }
   )"";
 #endif
