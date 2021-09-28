@@ -59,9 +59,10 @@ TEST_CASE("Reading configuration files", "[ZeekConfiguration]") {
     "osquery_extensions_socket": "/test/path",
     "max_queued_row_count": 1337,
 
-    "syscall_list": [
+    "excluded_syscall_list": [
       "write",
-      "execve"
+      "execve",
+      "connect"
     ],
   }
   )"";
@@ -91,8 +92,9 @@ TEST_CASE("Reading configuration files", "[ZeekConfiguration]") {
 
   REQUIRE(context.max_queued_row_count == 1337U);
 
-  REQUIRE(context.syscall_list.size() == 2U);
-  REQUIRE(context.syscall_list.at(0U) == "write");
-  REQUIRE(context.syscall_list.at(1U) == "execve");
+  REQUIRE(context.excluded_syscall_list.size() == 3U);
+  REQUIRE(context.excluded_syscall_list.size(0U) == "write");
+  REQUIRE(context.excluded_syscall_list.size(1U) == "execve");
+  REQUIRE(context.excluded_syscall_list.size(2U) == "connect");
 }
 } // namespace zeek
