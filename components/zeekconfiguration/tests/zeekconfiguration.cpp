@@ -93,8 +93,8 @@ TEST_CASE("Reading configuration files", "[ZeekConfiguration]") {
   REQUIRE(context.max_queued_row_count == 1337U);
 
   REQUIRE(context.excluded_syscall_list.size() == 3U);
-  REQUIRE(context.excluded_syscall_list.size(0U) == "write");
-  REQUIRE(context.excluded_syscall_list.size(1U) == "execve");
-  REQUIRE(context.excluded_syscall_list.size(2U) == "connect");
+  REQUIRE(context.excluded_syscall_list.at(0U) == "write");
+  REQUIRE(context.excluded_syscall_list.at(1U) == "execve");
+  REQUIRE(context.excluded_syscall_list.at(2U) == "connect");
 }
 } // namespace zeek
