@@ -17,6 +17,8 @@ struct FileEventsTablePlugin::PrivateData final {
   std::size_t max_queued_row_count{0U};
   FilePaths filepaths;
   std::mutex file_path_mutex;
+  std::map<int64_t,int64_t> fileInodes;
+  std::mutex file_inode_mutex;
 };
 
 Status FileEventsTablePlugin::create(Ref &obj,
@@ -79,7 +81,7 @@ Status FileEventsTablePlugin::processEvents(
     Row row;
 
     std::lock_guard<std::mutex> lock(d->file_path_mutex);
-    auto status = generateRow(row, audit_event,d->filepaths);
+    auto status = generateRow(row, audit_event,d->filepaths,d->fileInodes);
     if (!status.succeeded()) {
       return status;
     }
@@ -147,7 +149,7 @@ std::string FileEventsTablePlugin::CombinePaths(const std::string &cwd,
 }
 
 Status FileEventsTablePlugin::generateRow(
-    Row &row, const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_) {
+    Row &row, const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_,std::map<int64_t,int64_t> &fileInodes) {
   row = {};
 
   std::string syscall_name;
@@ -196,6 +198,7 @@ Status FileEventsTablePlugin::generateRow(
     full_path = CombinePaths(working_dir_path, file_path);
     auto fd = audit_event.syscall_data.exit_code;
     filepaths_[fd] = full_path;
+    fileInodes[fd] = inode;
     break;
   }
   case IAudispConsumer::SyscallRecordData::Type::Create: {
@@ -217,11 +220,15 @@ Status FileEventsTablePlugin::generateRow(
   case IAudispConsumer::SyscallRecordData::Type::Write: {
     syscall_name = "write";
     auto fd = static_cast<std::int64_t>(std::strtoll(audit_event.syscall_data.a0.c_str(), nullptr, 16U));
-    auto itr = filepaths_.find(fd);
-    if(itr!= filepaths_.end()){
-      full_path = itr->second;
+    auto fpItr = filepaths_.find(fd);
+    if(fpItr!= filepaths_.end()){
+      full_path = fpItr->second;
     } else{
       full_path = "Not Found";
+    }
+    auto fiItr = fileInodes.find(fd);
+    if(fiItr != fileInodes.end()){
+      inode = fiItr->second;
     }
     break;
   }
