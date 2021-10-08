@@ -265,6 +265,8 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
     { __NR_openat, SyscallRecordData::Type::OpenAt },
     { __NR_creat, SyscallRecordData::Type::Create },
     { __NR_write, SyscallRecordData::Type::Write },
+    { __NR_exit, SyscallRecordData::Type::Exit},
+    { __NR_exit_group, SyscallRecordData::Type::Exit_Group},
   };
   // clang-format on
 
@@ -284,6 +286,8 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
     { __NR_openat, "openat"},
     { __NR_creat, "creat" },
     { __NR_write, "write" },
+    { __NR_exit, "exit" },
+    { __NR_exit_group, "exit_group" },
   };
 
   data.reset();
@@ -375,7 +379,11 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
   } while (auparse->nextField() > 0);
 
   if (field_count != 12U) {
-    return Status::failure("One or more fields are missing");
+    if(output.type == SyscallRecordData::Type::Exit || output.type == SyscallRecordData::Type::Exit_Group){
+      output.exit_code = static_cast<std::int64_t>(std::strtoll(output.a0.c_str(), nullptr, 16U));
+    } else{
+      return Status::failure("One or more fields are missing");
+    }
   }
 
   data = std::move(output);

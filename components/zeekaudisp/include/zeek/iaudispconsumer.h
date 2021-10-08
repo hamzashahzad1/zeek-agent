@@ -25,7 +25,9 @@ public:
       Open,
       OpenAt,
       Create,
-      Write
+      Write,
+      Exit,
+      Exit_Group
     };
 
     /// \brief Event type
