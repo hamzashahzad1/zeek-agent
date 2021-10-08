@@ -164,9 +164,10 @@ Status ProcessEventsTablePlugin::generateRow(
   case IAudispConsumer::SyscallRecordData::Type::Clone:
     syscall_name = "clone";
     break;
-  case IAudispConsumer::SyscallRecordData::Type::Exit:
+  case IAudispConsumer::SyscallRecordData::Type::Exit:{
     syscall_name = "exit";
     break;
+  }
   case IAudispConsumer::SyscallRecordData::Type::Exit_Group:
     syscall_name = "exit_group";
     break;
