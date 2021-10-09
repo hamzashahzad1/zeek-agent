@@ -379,7 +379,7 @@ SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
             {"egid", kCreateAuditEvent.syscall_data.egid},
             {"exe", "/bin/cat"},
             {"path", "Not Found"},
-            {"inode", static_cast<std::int64_t>(409242)}};
+            {"inode", static_cast<std::int64_t>(-1)}};
 
         REQUIRE(row.size() == kExpectedColumnList.size()+1);
 
