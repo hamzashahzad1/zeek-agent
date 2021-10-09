@@ -267,6 +267,7 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
     { __NR_write, SyscallRecordData::Type::Write },
     { __NR_exit, SyscallRecordData::Type::Exit},
     { __NR_exit_group, SyscallRecordData::Type::Exit_Group},
+    { __NR_close, SyscallRecordData::Type::Close},
   };
   // clang-format on
 
@@ -288,6 +289,7 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
     { __NR_write, "write" },
     { __NR_exit, "exit" },
     { __NR_exit_group, "exit_group" },
+    { __NR_close, "close" },
   };
 
   data.reset();
@@ -380,9 +382,10 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
 
   if (field_count != 12U) {
     if(output.type == SyscallRecordData::Type::Exit || output.type == SyscallRecordData::Type::Exit_Group){
-      // output.exit_code = static_cast<std::int64_t>(std::strtoll(output.a0.c_str(), nullptr, 16U));
-      output.exit_code = static_cast<std::int64_t>(-1);
-      output.succeeded = true;
+      output.exit_code = static_cast<std::int64_t>(std::strtoll(output.a0.c_str(), nullptr, 16U));
+      // output.exit_code = static_cast<std::int64_t>(-1);
+      output.succeeded = false;
+      if (!output.exit_code) output.succeeded = true;
       std::string type = "exit_group";
       if(output.type == SyscallRecordData::Type::Exit){
         type = "exit";

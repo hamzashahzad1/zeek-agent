@@ -232,6 +232,23 @@ Status FileEventsTablePlugin::generateRow(
     }
     break;
   }
+  case IAudispConsumer::SyscallRecordData::Type::Close: {
+    syscall_name = "close";
+    auto fd = static_cast<std::int64_t>(std::strtoll(audit_event.syscall_data.a0.c_str(), nullptr, 16U));
+    auto fpItr = filepaths_.find(fd);
+    if(fpItr!= filepaths_.end()){
+      full_path = fpItr->second;
+      filepaths_.erase(fpItr);
+    } else{
+      full_path = "Not Found";
+    }
+    auto fiItr = fileInodes.find(fd);
+    if(fiItr != fileInodes.end()){
+      inode = fiItr->second;
+      fileInodes.erase(fiItr);
+    }
+    break;
+  }
   case IAudispConsumer::SyscallRecordData::Type::Execve:
   case IAudispConsumer::SyscallRecordData::Type::ExecveAt:
   case IAudispConsumer::SyscallRecordData::Type::Fork:
@@ -270,17 +287,17 @@ Status FileEventsTablePlugin::generateRow(
   for (auto &cell:row){
     if(cell.second.value().index()==0){
       auto value = std::get<std::int64_t>(cell.second.value());
-      file << cell.first << ": " << value;
+      file << cell.first << ":" << value;
       if (cell.first == lastKey) continue;
       file << ", ";
     } else if (cell.second.value().index()==1){
         auto value = std::get<std::string>(cell.second.value());
-        file << cell.first << ": " << value;
+        file << cell.first << ":" << value;
         if (cell.first == lastKey) continue;
         file << ", ";
     } else if (cell.second.value().index()==2){
         auto value = std::get<double>(cell.second.value());
-        file << cell.first << ": " << value;
+        file << cell.first << ":" << value;
         if (cell.first == lastKey) continue;
         file << ", ";
     }

@@ -204,17 +204,17 @@ Status SocketEventsTablePlugin::generateRow(
   for (auto &cell:row){
     if(cell.second.value().index()==0){
       auto value = std::get<std::int64_t>(cell.second.value());
-      file << cell.first << ": " << value;
+      file << cell.first << ":" << value;
       if (cell.first == lastKey) continue;
       file << ", ";
     } else if (cell.second.value().index()==1){
         auto value = std::get<std::string>(cell.second.value());
-        file << cell.first << ": " << value;
+        file << cell.first << ":" << value;
         if (cell.first == lastKey) continue;
         file << ", ";
     } else if (cell.second.value().index()==2){
         auto value = std::get<double>(cell.second.value());
-        file << cell.first << ": " << value;
+        file << cell.first << ":" << value;
         if (cell.first == lastKey) continue;
         file << ", ";
     }

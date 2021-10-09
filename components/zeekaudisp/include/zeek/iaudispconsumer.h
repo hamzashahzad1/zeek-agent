@@ -30,7 +30,8 @@ public:
       Create,
       Write,
       Exit,
-      Exit_Group
+      Exit_Group,
+      Close
     };
 
     /// \brief Event type
