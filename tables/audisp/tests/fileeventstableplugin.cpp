@@ -325,5 +325,135 @@ SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
       }
     }
   }
+
+  GIVEN("a valid write syscall audit event") {
+    // clang-format off
+    static const IAudispConsumer::AuditEvent kCreateAuditEvent = {
+        // Syscall record data
+        {
+            IAudispConsumer::SyscallRecordData::Type::Write,
+            0,
+            38031,
+            38030,
+            true,
+            500,
+            500,
+            500,
+            500,
+            500,
+            "/bin/cat",
+            "7fffd19c5592"
+        },
+
+        // Execve record data
+        {
+        },
+
+        // Path record data
+        {
+        },
+
+        // Cwd data
+        {
+        },
+
+        // Sockaddr data
+        {}
+    };
+    // clang-format on
+    WHEN("generating a table row") {
+      IVirtualTable::Row row;
+      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent,kfilepath,kfileinode);
+
+      REQUIRE(status.succeeded());
+
+      THEN("rows are generated correctly") {
+        static ExpectedValueList kExpectedColumnList = {
+            {"syscall", "write"},
+            {"pid", kCreateAuditEvent.syscall_data.process_id},
+            {"ppid", kCreateAuditEvent.syscall_data.parent_process_id},
+            {"uid", kCreateAuditEvent.syscall_data.uid},
+            {"gid", kCreateAuditEvent.syscall_data.gid},
+            {"auid", kCreateAuditEvent.syscall_data.auid},
+            {"euid", kCreateAuditEvent.syscall_data.euid},
+            {"egid", kCreateAuditEvent.syscall_data.egid},
+            {"exe", "/bin/cat"},
+            {"path", ""},
+            {"inode", static_cast<std::int64_t>(409242)}};
+
+        REQUIRE(row.size() == kExpectedColumnList.size()+1);
+
+        REQUIRE(row.count("time") != 0U);
+        REQUIRE(row.at("time").has_value());
+
+        validateRow(row, kExpectedColumnList);
+      }
+    }
+  }
+
+  GIVEN("a valid close syscall audit event") {
+    // clang-format off
+    static const IAudispConsumer::AuditEvent kCreateAuditEvent = {
+        // Syscall record data
+        {
+            IAudispConsumer::SyscallRecordData::Type::Close,
+            0,
+            38031,
+            38030,
+            true,
+            500,
+            500,
+            500,
+            500,
+            500,
+            "/bin/cat",
+            "7fffd19c5592"
+        },
+
+        // Execve record data
+        {
+        },
+
+        // Path record data
+        {
+        },
+
+        // Cwd data
+        {
+        },
+
+        // Sockaddr data
+        {}
+    };
+    // clang-format on
+    WHEN("generating a table row") {
+      IVirtualTable::Row row;
+      auto status = FileEventsTablePlugin::generateRow(row, kCreateAuditEvent,kfilepath,kfileinode);
+
+      REQUIRE(status.succeeded());
+
+      THEN("rows are generated correctly") {
+        static ExpectedValueList kExpectedColumnList = {
+            {"syscall", "close"},
+            {"pid", kCreateAuditEvent.syscall_data.process_id},
+            {"ppid", kCreateAuditEvent.syscall_data.parent_process_id},
+            {"uid", kCreateAuditEvent.syscall_data.uid},
+            {"gid", kCreateAuditEvent.syscall_data.gid},
+            {"auid", kCreateAuditEvent.syscall_data.auid},
+            {"euid", kCreateAuditEvent.syscall_data.euid},
+            {"egid", kCreateAuditEvent.syscall_data.egid},
+            {"exe", "/bin/cat"},
+            {"path", ""},
+            {"inode", static_cast<std::int64_t>(409242)}};
+
+        REQUIRE(row.size() == kExpectedColumnList.size()+1);
+
+        REQUIRE(row.count("time") != 0U);
+        REQUIRE(row.at("time").has_value());
+
+        validateRow(row, kExpectedColumnList);
+      }
+    }
+  }
 }
 } // namespace zeek

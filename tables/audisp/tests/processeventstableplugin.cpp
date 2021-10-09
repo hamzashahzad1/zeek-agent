@@ -310,5 +310,143 @@ SCENARIO("Row generation in the process_events table",
       }
     }
   }
+
+  GIVEN("a valid exit audit event") {
+    // clang-format off
+    static const IAudispConsumer::AuditEvent kCloneAuditEvent = {
+      // Syscall record data
+      {
+        IAudispConsumer::SyscallRecordData::Type::Exit,
+        2,
+        58031,
+        58030,
+        true,
+        3000,
+        3000,
+        3000,
+        3000,
+        3000,
+        "\"/usr/bin/bash\"",
+        "23eb8e0"
+      },
+
+      // Execve record data
+      { },
+
+      // Path record data
+      { },
+
+      // Cwd data
+      { },
+
+      // Sockaddr data
+      {}
+    };
+    // clang-format on
+
+    WHEN("generating table rows") {
+      IVirtualTable::Row row;
+      auto status =
+          ProcessEventsTablePlugin::generateRow(row, kCloneAuditEvent);
+
+      REQUIRE(status.succeeded());
+
+      THEN("rows are generated correctly") {
+        static ExpectedValueList kExpectedCloneColumnList = {
+            {"syscall", "exit"},
+            {"pid", kCloneAuditEvent.syscall_data.process_id},
+            {"ppid", kCloneAuditEvent.syscall_data.parent_process_id},
+            {"auid", kCloneAuditEvent.syscall_data.auid},
+            {"uid", kCloneAuditEvent.syscall_data.uid},
+            {"euid", kCloneAuditEvent.syscall_data.euid},
+            {"gid", kCloneAuditEvent.syscall_data.gid},
+            {"egid", kCloneAuditEvent.syscall_data.egid},
+            {"exe", kCloneAuditEvent.syscall_data.exe},
+            {"exit", kCloneAuditEvent.syscall_data.exit_code},
+            {"cmdline", {""}},
+            {"path", {""}},
+            {"mode", static_cast<std::int64_t>(0)},
+            {"ouid", static_cast<std::int64_t>(0)},
+            {"ogid", static_cast<std::int64_t>(0)},
+            {"inode", static_cast<std::int64_t>(0)},
+            {"cwd", {""}}};
+
+        REQUIRE(row.size() == kExpectedCloneColumnList.size() + 1);
+        REQUIRE(row.count("time") != 0U);
+        REQUIRE(row.at("time").has_value());
+
+        validateRow(row, kExpectedCloneColumnList);
+      }
+    }
+  }
+
+  GIVEN("a valid exit_group audit event") {
+    // clang-format off
+    static const IAudispConsumer::AuditEvent kCloneAuditEvent = {
+      // Syscall record data
+      {
+        IAudispConsumer::SyscallRecordData::Type::Exit_Group,
+        2,
+        58031,
+        58030,
+        true,
+        3000,
+        3000,
+        3000,
+        3000,
+        3000,
+        "\"/usr/bin/bash\"",
+        "23eb8e0"
+      },
+
+      // Execve record data
+      { },
+
+      // Path record data
+      { },
+
+      // Cwd data
+      { },
+
+      // Sockaddr data
+      {}
+    };
+    // clang-format on
+
+    WHEN("generating table rows") {
+      IVirtualTable::Row row;
+      auto status =
+          ProcessEventsTablePlugin::generateRow(row, kCloneAuditEvent);
+
+      REQUIRE(status.succeeded());
+
+      THEN("rows are generated correctly") {
+        static ExpectedValueList kExpectedCloneColumnList = {
+            {"syscall", "exit_group"},
+            {"pid", kCloneAuditEvent.syscall_data.process_id},
+            {"ppid", kCloneAuditEvent.syscall_data.parent_process_id},
+            {"auid", kCloneAuditEvent.syscall_data.auid},
+            {"uid", kCloneAuditEvent.syscall_data.uid},
+            {"euid", kCloneAuditEvent.syscall_data.euid},
+            {"gid", kCloneAuditEvent.syscall_data.gid},
+            {"egid", kCloneAuditEvent.syscall_data.egid},
+            {"exe", kCloneAuditEvent.syscall_data.exe},
+            {"exit", kCloneAuditEvent.syscall_data.exit_code},
+            {"cmdline", {""}},
+            {"path", {""}},
+            {"mode", static_cast<std::int64_t>(0)},
+            {"ouid", static_cast<std::int64_t>(0)},
+            {"ogid", static_cast<std::int64_t>(0)},
+            {"inode", static_cast<std::int64_t>(0)},
+            {"cwd", {""}}};
+
+        REQUIRE(row.size() == kExpectedCloneColumnList.size() + 1);
+        REQUIRE(row.count("time") != 0U);
+        REQUIRE(row.at("time").has_value());
+
+        validateRow(row, kExpectedCloneColumnList);
+      }
+    }
+  }
 }
 } // namespace zeek
