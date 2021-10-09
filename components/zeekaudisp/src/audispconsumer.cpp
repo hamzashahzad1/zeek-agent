@@ -381,6 +381,8 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
   if (field_count != 12U) {
     if(output.type == SyscallRecordData::Type::Exit || output.type == SyscallRecordData::Type::Exit_Group){
       // output.exit_code = static_cast<std::int64_t>(std::strtoll(output.a0.c_str(), nullptr, 16U));
+      output.exit_code = static_cast<std::int64_t>(-1);
+      output.succeeded = true;
       std::string type = "exit_group";
       if(output.type == SyscallRecordData::Type::Exit){
         type = "exit";
@@ -390,6 +392,8 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
       filepath = filepath + "/debug_log";
       file.open(filepath,std::ios_base::app);
       file << "The total fields for "+type+ " are: " <<field_count <<std::endl;
+      data = std::move(output);
+      return Status::success();
     } else{
       return Status::failure("One or more fields are missing");
     }
