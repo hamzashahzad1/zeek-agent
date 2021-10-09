@@ -257,7 +257,31 @@ Status ProcessEventsTablePlugin::generateRow(
     row["ogid"] = {null_value};
     row["cwd"] = {""};
   }
-
+  std::string filepath = get_current_dir_name();
+  filepath = filepath + "/process_events.log";
+  std::ofstream file;
+  file.open(filepath,std::ios_base::app);
+  const auto lastKey = row.rbegin()->first;
+  file << "{";
+  for (auto &cell:row){
+    if(cell.second.value().index()==0){
+      auto value = std::get<std::int64_t>(cell.second.value());
+      file << cell.first << ": " << value;
+      if (cell.first == lastKey) continue;
+      file << ", ";
+    } else if (cell.second.value().index()==1){
+        auto value = std::get<std::string>(cell.second.value());
+        file << cell.first << ": " << value;
+        if (cell.first == lastKey) continue;
+        file << ", ";
+    } else if (cell.second.value().index()==2){
+        auto value = std::get<double>(cell.second.value());
+        file << cell.first << ": " << value;
+        if (cell.first == lastKey) continue;
+        file << ", ";
+    }
+  }
+  file <<"}\n"; file.close();
   return Status::success();
 }
 } // namespace zeek

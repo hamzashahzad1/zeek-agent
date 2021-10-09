@@ -6,6 +6,9 @@
 
 #include <zeek/status.h>
 #include <zeek/izeekconfiguration.h>
+#include <fstream>
+#include <filesystem>
+#include <unistd.h>
 
 namespace zeek {
 /// \brief Audisp socket consumer (interface)

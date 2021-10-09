@@ -16,9 +16,6 @@
 #include <netinet/ip.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <fstream>
-#include <filesystem>
-#include <unistd.h>
 
 namespace zeek {
 struct AudispConsumer::PrivateData final {
@@ -384,11 +381,15 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
   if (field_count != 12U) {
     if(output.type == SyscallRecordData::Type::Exit || output.type == SyscallRecordData::Type::Exit_Group){
       // output.exit_code = static_cast<std::int64_t>(std::strtoll(output.a0.c_str(), nullptr, 16U));
+      std::string type = "exit_group";
+      if(output.type == SyscallRecordData::Type::Exit){
+        type = "exit";
+      }
       std::ofstream file;
       std::string filepath = get_current_dir_name();
       filepath = filepath + "/debug_log";
       file.open(filepath,std::ios_base::app);
-      file << "The total fields for exit/exit_group are: " <<field_count <<std::endl;
+      file << "The total fields for "+type+ " are: " <<field_count <<std::endl;
     } else{
       return Status::failure("One or more fields are missing");
     }
