@@ -378,7 +378,7 @@ SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
             {"euid", kCreateAuditEvent.syscall_data.euid},
             {"egid", kCreateAuditEvent.syscall_data.egid},
             {"exe", "/bin/cat"},
-            {"path", ""},
+            {"path", "Not Found"},
             {"inode", static_cast<std::int64_t>(409242)}};
 
         REQUIRE(row.size() == kExpectedColumnList.size()+1);
@@ -443,7 +443,7 @@ SCENARIO("Row generation in the file_events table", "[FileEventsTablePlugin]") {
             {"euid", kCreateAuditEvent.syscall_data.euid},
             {"egid", kCreateAuditEvent.syscall_data.egid},
             {"exe", "/bin/cat"},
-            {"path", ""},
+            {"path", "Not Found"},
             {"inode", static_cast<std::int64_t>(409242)}};
 
         REQUIRE(row.size() == kExpectedColumnList.size()+1);
