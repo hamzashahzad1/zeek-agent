@@ -127,6 +127,17 @@ const ConfigurationChecker::Constraints kConfigurationConstraints = {
       "",
       true
     }
+  },
+
+  {
+    "store_local_logs",
+
+    {
+      ConfigurationChecker::MemberConstraint::Type::String,
+      false,
+      "",
+      true
+    }
   }
 };
 // clang-format on
@@ -188,6 +199,10 @@ std::size_t ZeekConfiguration::maxQueuedRowCount() const {
 
 const std::vector<std::string> &ZeekConfiguration::excludedSyscallList() const {
   return d->context.excluded_syscall_list;
+}
+
+const bool &ZeekConfiguration::storeLocalLogs() const {
+  return d->context.store_local_logs;
 }
 
 ZeekConfiguration::ZeekConfiguration(IVirtualDatabase &virtual_database,
@@ -299,6 +314,12 @@ Status ZeekConfiguration::parseConfigurationData(Context &context,
   for (auto i = 0U; i < excluded_syscall_list.Size(); ++i) {
     const auto &syscall = excluded_syscall_list[i].GetString();
     context.excluded_syscall_list.push_back(syscall);
+  }
+
+  if(document["store_local_logs"].GetString()=="false"){
+    context.store_local_logs = false;
+  } else {
+    context.store_local_logs = true;
   }
 
   if (document.HasMember("max_queued_row_count")) {

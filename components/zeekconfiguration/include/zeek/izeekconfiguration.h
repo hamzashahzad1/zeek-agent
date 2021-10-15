@@ -57,6 +57,10 @@ public:
   /// \return Returns the syscall list to be excluded
   virtual const std::vector<std::string> &excludedSyscallList() const = 0;
 
+  /// \brief Returns whether to store event logs locally as well or not
+  /// \return Returns true when user wants to store logs locally as well. False otherwise
+  virtual const bool &storeLocalLogs() const = 0;
+
   IZeekConfiguration(const IZeekConfiguration &) = delete;
   IZeekConfiguration &operator=(const IZeekConfiguration &) = delete;
 };

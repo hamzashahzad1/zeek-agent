@@ -42,6 +42,11 @@ public:
   /// \return Returns the syscall list to be excluded
   virtual const std::vector<std::string> &excludedSyscallList() const override;
 
+  /// \brief Returns whether to store event logs locally as well or not
+  /// \return Returns true when user wants to store logs locally as well. False otherwise
+  virtual const bool &storeLocalLogs() const override;
+
+
 protected:
   /// \brief Constructor
   /// \param virtual_database A reference to a virtual database instance. Used
@@ -101,6 +106,9 @@ public:
 
     /// \brief List of System calls to exclude
     std::vector<std::string> excluded_syscall_list;
+
+    /// \brief Determines whether to store logs locally as well or not
+    bool store_local_logs;
   };
 
   /// \brief Parses the given configuration data in JSON format

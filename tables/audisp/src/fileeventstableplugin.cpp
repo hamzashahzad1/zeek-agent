@@ -14,7 +14,11 @@ struct FileEventsTablePlugin::PrivateData final {
 
   RowList row_list;
   std::mutex row_list_mutex;
+  
   std::size_t max_queued_row_count{0U};
+  bool store_local_logs;
+  std::string log_folder;
+
   FilePaths filepaths;
   std::mutex file_path_mutex;
   std::map<int64_t,int64_t> fileInodes;
@@ -81,7 +85,7 @@ Status FileEventsTablePlugin::processEvents(
     Row row;
 
     std::lock_guard<std::mutex> lock(d->file_path_mutex);
-    auto status = generateRow(row, audit_event,d->filepaths,d->fileInodes);
+    auto status = generateRow(row, audit_event,d->filepaths,d->fileInodes,d->store_local_logs,d->log_folder);
     if (!status.succeeded()) {
       return status;
     }
@@ -120,6 +124,8 @@ FileEventsTablePlugin::FileEventsTablePlugin(IZeekConfiguration &configuration,
     : d(new PrivateData(configuration, logger)) {
 
   d->max_queued_row_count = d->configuration.maxQueuedRowCount();
+  d->store_local_logs = d->configuration.storeLocalLogs();
+  d->log_folder = d->configuration.getLogFolder();
 }
 
 std::string FileEventsTablePlugin::CombinePaths(const std::string &cwd,
@@ -149,7 +155,7 @@ std::string FileEventsTablePlugin::CombinePaths(const std::string &cwd,
 }
 
 Status FileEventsTablePlugin::generateRow(
-    Row &row, const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_,std::map<int64_t,int64_t> &fileInodes) {
+    Row &row, const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_,std::map<int64_t,int64_t> &fileInodes, bool store_local_logs, std::string log_folder) {
   row = {};
 
   std::string syscall_name;
@@ -278,31 +284,34 @@ Status FileEventsTablePlugin::generateRow(
 
   row["time"] = static_cast<std::int64_t>(current_timestamp.count());
 
-  std::string filepath = get_current_dir_name();
-  filepath = filepath + "/file_events.log";
-  std::ofstream file;
-  file.open(filepath,std::ios_base::app);
-  const auto lastKey = row.rbegin()->first;
-  file << "{";
-  for (auto &cell:row){
-    if(cell.second.value().index()==0){
-      auto value = std::get<std::int64_t>(cell.second.value());
-      file << cell.first << ":" << value;
-      if (cell.first == lastKey) continue;
-      file << ", ";
-    } else if (cell.second.value().index()==1){
-        auto value = std::get<std::string>(cell.second.value());
+  if(store_local_logs){
+    std::string filepath = log_folder;
+    filepath = filepath + "/file_events.log";
+    std::ofstream file;
+    file.open(filepath,std::ios_base::app);
+    const auto lastKey = row.rbegin()->first;
+    file << "{";
+    for (auto &cell:row){
+      if(cell.second.value().index()==0){
+        auto value = std::get<std::int64_t>(cell.second.value());
         file << cell.first << ":" << value;
         if (cell.first == lastKey) continue;
         file << ", ";
-    } else if (cell.second.value().index()==2){
-        auto value = std::get<double>(cell.second.value());
-        file << cell.first << ":" << value;
-        if (cell.first == lastKey) continue;
-        file << ", ";
+      } else if (cell.second.value().index()==1){
+          auto value = std::get<std::string>(cell.second.value());
+          file << cell.first << ":" << value;
+          if (cell.first == lastKey) continue;
+          file << ", ";
+      } else if (cell.second.value().index()==2){
+          auto value = std::get<double>(cell.second.value());
+          file << cell.first << ":" << value;
+          if (cell.first == lastKey) continue;
+          file << ", ";
+      }
     }
+    file <<"}\n"; file.close();
   }
-  file <<"}\n"; file.close();
+ 
 
   return Status::success();
 }

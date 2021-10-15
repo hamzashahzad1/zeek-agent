@@ -14,6 +14,8 @@ struct SocketEventsTablePlugin::PrivateData final {
   RowList row_list;
   std::mutex row_list_mutex;
   std::size_t max_queued_row_count{0U};
+  bool store_local_logs;
+  std::string log_folder;
 };
 
 Status SocketEventsTablePlugin::create(Ref &obj,
@@ -81,7 +83,7 @@ Status SocketEventsTablePlugin::processEvents(
   for (const auto &audit_event : event_list) {
     Row row;
 
-    auto status = generateRow(row, audit_event);
+    auto status = generateRow(row, audit_event,d->store_local_logs,d->log_folder);
     if (!status.succeeded()) {
       return status;
     }
@@ -119,10 +121,12 @@ SocketEventsTablePlugin::SocketEventsTablePlugin(
     : d(new PrivateData(configuration, logger)) {
 
   d->max_queued_row_count = d->configuration.maxQueuedRowCount();
+  d->store_local_logs = d->configuration.storeLocalLogs();
+  d->log_folder = d->configuration.getLogFolder();
 }
 
 Status SocketEventsTablePlugin::generateRow(
-    Row &row, const IAudispConsumer::AuditEvent &audit_event) {
+    Row &row, const IAudispConsumer::AuditEvent &audit_event, bool store_local_logs, std:: string log_folder) {
   row = {};
 
   std::string syscall_name;
@@ -195,31 +199,34 @@ Status SocketEventsTablePlugin::generateRow(
 
   row["time"] = static_cast<std::int64_t>(current_timestamp.count());
 
-  std::string filepath = get_current_dir_name();
-  filepath = filepath + "/socket_events.log";
-  std::ofstream file;
-  file.open(filepath,std::ios_base::app);
-  const auto lastKey = row.rbegin()->first;
-  file << "{";
-  for (auto &cell:row){
-    if(cell.second.value().index()==0){
-      auto value = std::get<std::int64_t>(cell.second.value());
-      file << cell.first << ":" << value;
-      if (cell.first == lastKey) continue;
-      file << ", ";
-    } else if (cell.second.value().index()==1){
-        auto value = std::get<std::string>(cell.second.value());
+  if(store_local_logs){
+    std::string filepath = log_folder;
+    filepath = filepath + "/socket_events.log";
+    std::ofstream file;
+    file.open(filepath,std::ios_base::app);
+    const auto lastKey = row.rbegin()->first;
+    file << "{";
+    for (auto &cell:row){
+      if(cell.second.value().index()==0){
+        auto value = std::get<std::int64_t>(cell.second.value());
         file << cell.first << ":" << value;
         if (cell.first == lastKey) continue;
         file << ", ";
-    } else if (cell.second.value().index()==2){
-        auto value = std::get<double>(cell.second.value());
-        file << cell.first << ":" << value;
-        if (cell.first == lastKey) continue;
-        file << ", ";
+      } else if (cell.second.value().index()==1){
+          auto value = std::get<std::string>(cell.second.value());
+          file << cell.first << ":" << value;
+          if (cell.first == lastKey) continue;
+          file << ", ";
+      } else if (cell.second.value().index()==2){
+          auto value = std::get<double>(cell.second.value());
+          file << cell.first << ":" << value;
+          if (cell.first == lastKey) continue;
+          file << ", ";
+      }
     }
+    file <<"}\n"; file.close();
   }
-  file <<"}\n"; file.close();
+  
 
   return Status::success();
 }

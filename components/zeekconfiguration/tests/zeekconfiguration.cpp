@@ -62,7 +62,8 @@ TEST_CASE("Reading configuration files", "[ZeekConfiguration]") {
       "write",
       "execve",
       "connect"
-    ]
+    ],
+    "store_local_logs": "true"
   }
   )"";
 #endif
@@ -95,5 +96,6 @@ TEST_CASE("Reading configuration files", "[ZeekConfiguration]") {
   REQUIRE(context.excluded_syscall_list.at(0U) == "write");
   REQUIRE(context.excluded_syscall_list.at(1U) == "execve");
   REQUIRE(context.excluded_syscall_list.at(2U) == "connect");
+  REQUIRE(context.store_local_logs == true);
 }
 } // namespace zeek

@@ -7,6 +7,8 @@ namespace zeek {
 SCENARIO("Row generation in the socket_events table",
          "[SocketEventsTablePlugin]") {
 
+  bool store_local_logs = true;
+  std::string log_folder = "/var/log/zeek";
   GIVEN("a valid connect audit event") {
     // clang-format off
     static const IAudispConsumer::AuditEvent kConnectAuditEvent = {
@@ -49,7 +51,7 @@ SCENARIO("Row generation in the socket_events table",
     WHEN("generating a table row") {
       IVirtualTable::Row row;
       auto status =
-          SocketEventsTablePlugin::generateRow(row, kConnectAuditEvent);
+          SocketEventsTablePlugin::generateRow(row, kConnectAuditEvent,store_local_logs,log_folder);
 
       REQUIRE(status.succeeded());
 
@@ -122,7 +124,7 @@ SCENARIO("Row generation in the socket_events table",
 
     WHEN("generating table rows") {
       IVirtualTable::Row row;
-      auto status = SocketEventsTablePlugin::generateRow(row, kBindAuditEvent);
+      auto status = SocketEventsTablePlugin::generateRow(row, kBindAuditEvent,store_local_logs,log_folder);
 
       REQUIRE(status.succeeded());
 

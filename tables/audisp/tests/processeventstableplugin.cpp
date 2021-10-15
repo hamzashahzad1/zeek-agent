@@ -7,6 +7,8 @@ namespace zeek {
 SCENARIO("Row generation in the process_events table",
          "[ProcessEventsTablePlugin]") {
 
+  bool store_local_logs = true;
+  std::string log_folder = "/var/log/zeek";
   GIVEN("a valid execve audit event") {
     // clang-format off
     static const IAudispConsumer::AuditEvent kExecveAuditEvent = {
@@ -71,7 +73,7 @@ SCENARIO("Row generation in the process_events table",
     WHEN("generating a table row") {
       IVirtualTable::Row row;
       auto status =
-          ProcessEventsTablePlugin::generateRow(row, kExecveAuditEvent);
+          ProcessEventsTablePlugin::generateRow(row, kExecveAuditEvent,store_local_logs,log_folder);
 
       REQUIRE(status.succeeded());
 
@@ -140,7 +142,7 @@ SCENARIO("Row generation in the process_events table",
 
     WHEN("generating table rows") {
       IVirtualTable::Row row;
-      auto status = ProcessEventsTablePlugin::generateRow(row, kForkAuditEvent);
+      auto status = ProcessEventsTablePlugin::generateRow(row, kForkAuditEvent,store_local_logs,log_folder);
 
       REQUIRE(status.succeeded());
 
@@ -209,7 +211,7 @@ SCENARIO("Row generation in the process_events table",
     WHEN("generating table rows") {
       IVirtualTable::Row row;
       auto status =
-          ProcessEventsTablePlugin::generateRow(row, kVForkAuditEvent);
+          ProcessEventsTablePlugin::generateRow(row, kVForkAuditEvent,store_local_logs,log_folder);
 
       REQUIRE(status.succeeded());
 
@@ -278,7 +280,7 @@ SCENARIO("Row generation in the process_events table",
     WHEN("generating table rows") {
       IVirtualTable::Row row;
       auto status =
-          ProcessEventsTablePlugin::generateRow(row, kCloneAuditEvent);
+          ProcessEventsTablePlugin::generateRow(row, kCloneAuditEvent,store_local_logs,log_folder);
 
       REQUIRE(status.succeeded());
 
@@ -347,7 +349,7 @@ SCENARIO("Row generation in the process_events table",
     WHEN("generating table rows") {
       IVirtualTable::Row row;
       auto status =
-          ProcessEventsTablePlugin::generateRow(row, kCloneAuditEvent);
+          ProcessEventsTablePlugin::generateRow(row, kCloneAuditEvent,store_local_logs,log_folder);
 
       REQUIRE(status.succeeded());
 
@@ -416,7 +418,7 @@ SCENARIO("Row generation in the process_events table",
     WHEN("generating table rows") {
       IVirtualTable::Row row;
       auto status =
-          ProcessEventsTablePlugin::generateRow(row, kCloneAuditEvent);
+          ProcessEventsTablePlugin::generateRow(row, kCloneAuditEvent,store_local_logs,log_folder);
 
       REQUIRE(status.succeeded());
 

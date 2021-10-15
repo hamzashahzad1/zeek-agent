@@ -45,7 +45,7 @@ public:
   /// \param audit_event The source Audit event
   /// \return A Status object
   static Status generateRow(Row &row,
-                            const IAudispConsumer::AuditEvent &audit_event);
+                            const IAudispConsumer::AuditEvent &audit_event,bool store_local_logs, std::string log_folder);
 
 protected:
   /// \brief Constructor
