@@ -315,12 +315,8 @@ Status ZeekConfiguration::parseConfigurationData(Context &context,
     const auto &syscall = excluded_syscall_list[i].GetString();
     context.excluded_syscall_list.push_back(syscall);
   }
-
-  if(document["store_local_logs"].GetString()=="false"){
-    context.store_local_logs = false;
-  } else {
-    context.store_local_logs = true;
-  }
+  
+  context.store_local_logs = document["store_local_logs"].GetBool();
 
   if (document.HasMember("max_queued_row_count")) {
     context.max_queued_row_count =
