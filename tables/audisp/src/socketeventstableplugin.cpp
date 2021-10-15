@@ -126,7 +126,7 @@ SocketEventsTablePlugin::SocketEventsTablePlugin(
 }
 
 Status SocketEventsTablePlugin::generateRow(
-    Row &row, const IAudispConsumer::AuditEvent &audit_event, bool store_local_logs, std:: string log_folder) {
+    Row &row, const IAudispConsumer::AuditEvent &audit_event, bool &store_local_logs, std:: string &log_folder) {
   row = {};
 
   std::string syscall_name;

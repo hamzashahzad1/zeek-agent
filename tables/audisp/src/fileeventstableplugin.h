@@ -50,7 +50,7 @@ public:
   /// \param audit_event a single Audit event
   /// \return A Status object
   static Status generateRow(Row &row,
-                            const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_,std::map<int64_t,int64_t> &fileInodes, bool store_local_logs, std::string log_folder);
+                            const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_,std::map<int64_t,int64_t> &fileInodes, bool &store_local_logs, std::string &log_folder);
 
 protected:
   /// \brief Constructor

@@ -155,7 +155,7 @@ std::string FileEventsTablePlugin::CombinePaths(const std::string &cwd,
 }
 
 Status FileEventsTablePlugin::generateRow(
-    Row &row, const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_,std::map<int64_t,int64_t> &fileInodes, bool store_local_logs, std::string log_folder) {
+    Row &row, const IAudispConsumer::AuditEvent &audit_event,FilePaths &filepaths_,std::map<int64_t,int64_t> &fileInodes, bool &store_local_logs, std::string &log_folder) {
   row = {};
 
   std::string syscall_name;

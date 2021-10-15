@@ -390,11 +390,6 @@ AudispConsumer::parseSyscallRecord(std::optional<SyscallRecordData> &data,
       if(output.type == SyscallRecordData::Type::Exit){
         type = "exit";
       }
-      std::ofstream file;
-      std::string filepath = get_current_dir_name();
-      filepath = filepath + "/debug_log";
-      file.open(filepath,std::ios_base::app);
-      file << "The total fields for "+type+ " are: " <<field_count <<std::endl;
       data = std::move(output);
       return Status::success();
     } else{
