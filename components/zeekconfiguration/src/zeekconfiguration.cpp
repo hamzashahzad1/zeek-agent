@@ -316,13 +316,16 @@ Status ZeekConfiguration::parseConfigurationData(Context &context,
     context.excluded_syscall_list.push_back(syscall);
   }
   
-  context.store_local_logs = document["store_local_logs"].GetBool();
+  context.store_local_logs = true;
+  std::string store_local_logs = document["store_local_logs"].GetString();
+  if(store_local_logs=="no") context.store_local_logs = false;
   std::ofstream file;
   std::string filepath = context.log_folder;
   filepath = filepath + "/debug_log";
   file.open(filepath,std::ios_base::app);
   file << "The type of the variable store_local_logs is: " << typeid(context.store_local_logs).name() <<std::endl;
   file << "The value of the variable store_local_logs is: " << context.store_local_logs <<std::endl;
+  file << "The string value of the variable store_local_logs is: " << store_local_logs <<std::endl;
 
   if (document.HasMember("max_queued_row_count")) {
     context.max_queued_row_count =

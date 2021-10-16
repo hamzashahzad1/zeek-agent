@@ -63,7 +63,7 @@ TEST_CASE("Reading configuration files", "[ZeekConfiguration]") {
       "execve",
       "connect"
     ],
-    "store_local_logs": "false"
+    "store_local_logs": "no"
   }
   )"";
 #endif
