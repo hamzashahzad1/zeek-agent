@@ -212,9 +212,6 @@ jobs:
 #         ls
 #         echo "lib64 of build folder"
 #         cd /home/runner/work/zeek-agent/zeek-agent/build/libraries/openssl/install/lib64
-#         ls
-#         echo "lib64 of package folder"
-#         cd /home/runner/work/zeek-agent/zeek-agent/package/libraries/openssl/install/lib64
     
 #     - name: Build the packages
 #       run: |
