@@ -154,7 +154,6 @@ jobs:
       run: |
         echo ::set-output name=DEB_PACKAGE_PATH::$(ls linux_deb_package-Release-3.1/*.zip)
         echo ::set-output name=DEB_ASSET_NAME::zeek31_$(cd linux_deb_package-Release-3.1 && ls *.zip)
-        echo ${{ env.UPLOAD_RELEASE }}
         
     - name: Draft the new release
       id: create_release
