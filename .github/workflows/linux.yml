@@ -276,9 +276,11 @@ jobs:
       run: |
         echo ::set-output name=DEB_PACKAGE_PATH::$(ls linux_deb_package-Release-3.1/*.zip)
         echo ::set-output name=DEB_ASSET_NAME::zeek31_$(cd linux_deb_package-Release-3.1 && ls *.zip)
+        echo ${{ env.UPLOAD_RELEASE }}
         
     - name: Draft the new release
       id: create_release
+      if: ${{ env.UPLOAD_RELEASE == 'hi' }}
       uses: actions/create-release@v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -290,7 +292,7 @@ jobs:
         
     - name: Upload the Zeek 3.1 .deb package
       id: upload_deb_package_zeek31
-      if: ${{ env.UPLOAD_RELEASE == 'hi' }}
+#       if: ${{ env.UPLOAD_RELEASE == 'hi' }}
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
