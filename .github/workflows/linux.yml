@@ -22,6 +22,9 @@ jobs:
         build_type: [Release]
         zeek_version: ['3.1']
 
+    env:
+      UPLOAD_RELEASE: false
+    
     steps:
     - uses: actions/checkout@v2
 
@@ -287,6 +290,7 @@ jobs:
         
     - name: Upload the Zeek 3.1 .deb package
       id: upload_deb_package_zeek31
+      if: ${{ env.UPLOAD_RELEASE == true }}
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
