@@ -165,7 +165,7 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: Version v1.0.3
-        draft: true
+        draft: false
         prerelease: false
         
     - name: Upload the Zeek 3.1 .deb package
