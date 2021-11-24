@@ -22,15 +22,20 @@ jobs:
         build_type: [Release]
         zeek_version: ['3.1']
 
-    env:
-      UPLOAD_RELEASE: true
-    
     steps:
     - uses: actions/checkout@v2
+
+#     - name: Select the osquery-toolchain version
+#       id: osquery_toolchain_version
+#       run: echo ::set-output name=VALUE::1.1.0
 
     - name: Select the CMake version
       id: cmake_version
       run: echo ::set-output name=VALUE::3.16.3
+
+#     - name: Select the osquery version
+#       id: osquery_version
+#       run: echo ::set-output name=VALUE::4.2.0
 
     - name: Select the sanitizers setting
       id: sanitizers_settings
@@ -40,6 +45,24 @@ jobs:
         else
           echo ::set-output name=VALUE::false
         fi
+
+#     - name: Acquire the osquery source code
+#       run: |
+#         git clone --branch "${{ steps.osquery_version.outputs.VALUE }}" https://github.com/osquery/osquery osquery
+#         mkdir -p osquery/.git/modules
+
+#     - name: Update the osquery/bzip2 submodule
+#       run: |
+#         sed -i.bak 's=https://sourceware.org/git/bzip2.git=https://github.com/osquery/third-party-bzip2=g' "osquery/.gitmodules"
+#         rm osquery/.gitmodules.bak
+
+#     - name: Update the osquery/OpenSSL 1.0.2t download link
+#       run: |
+#         sed -i 's=https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz=https://www.openssl.org/source/old/1.0.2/openssl-1.0.2t.tar.gz=g' "osquery/libraries/cmake/formula/openssl/CMakeLists.txt"
+
+#     - name: Generate the cache key
+#       id: cache_key
+#       run: echo ::set-output name=VALUE::${{ matrix.os }}_type-${{ matrix.build_type }}_osquery-toolchain-${{ steps.osquery_toolchain_version.outputs.VALUE }}_cmake-${{ steps.cmake_version.outputs.VALUE }}_zeek-version-${{ matrix.zeek_version }}
 
     - name: Generate the cache key
       id: cache_key
@@ -63,6 +86,12 @@ jobs:
         path: .git/modules
         key: ${{ steps.cache_key.outputs.VALUE }}_zeekagent_gitsubmodules
 
+#     - name: Update the cache (git submodules - osquery)
+#       uses: actions/cache@v1.0.3
+#       with:
+#         path: osquery/.git/modules
+#         key: ${{ steps.cache_key.outputs.VALUE }}_osquery_gitsubmodules
+
     - name: Create the build folders
       run: mkdir -p ccache build install downloads package
 
@@ -71,6 +100,16 @@ jobs:
 
     - name: Update the submodules
       run: git submodule update --init --recursive
+
+#     - name: Install the osquery-toolchain
+#       id: osquery_toolchain_installer
+#       run: |
+#         if [ ! -f downloads/osquery-toolchain.tar.xz ] ; then
+#           curl -L "https://github.com/osquery/osquery-toolchain/releases/download/${{ steps.osquery_toolchain_version.outputs.VALUE }}/osquery-toolchain-${{ steps.osquery_toolchain_version.outputs.VALUE }}-x86_64.tar.xz" -o downloads/osquery-toolchain.tar.xz
+#         fi
+
+#         tar xf downloads/osquery-toolchain.tar.xz
+#         echo ::set-output name=PATH::$(realpath osquery-toolchain)
 
     - name: Install system dependencies
       run: sudo apt-get install cppcheck ccache curl flex bison rpm doxygen ninja-build graphviz -y
@@ -85,6 +124,14 @@ jobs:
         tar xzf downloads/cmake.tar.gz
         echo ::set-output name=CMAKE_BINARY::$(realpath $(find cmake* -type d -name bin)/cmake)
 
+#     - name: Link the Zeek Agent source folder inside the osquery source tree
+#       run: ln -s "$(pwd)" "$(realpath osquery)/external/extension_zeek-agent"
+
+#     - name: Configure the project
+#       run: |
+#         export CCACHE_DIR="$(realpath ccache)"
+#         ( cd build && "${{ steps.cmake_installer.outputs.CMAKE_BINARY }}" -G Ninja -DOSQUERY_NO_DEBUG_SYMBOLS:BOOL=true -DOSQUERY_TOOLCHAIN_SYSROOT:PATH="${{ steps.osquery_toolchain_installer.outputs.PATH }}" -DCMAKE_INSTALL_PREFIX:PATH="/usr" -DCMAKE_BUILD_TYPE:STRING="${{ matrix.build_type }}" -DZEEK_AGENT_ENABLE_DOCUMENTATION:BOOL=true -DZEEK_AGENT_ENABLE_INSTALL:BOOL=true -DZEEK_AGENT_ENABLE_TESTS:BOOL=true -DZEEK_AGENT_ENABLE_SANITIZERS:BOOL="${{ steps.sanitizers_settings.outputs.VALUE }}" -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="${{ matrix.zeek_version }}" ../osquery )
+
     - name: Configure the project
       run: |
         sudo apt-get update -y
@@ -95,6 +142,15 @@ jobs:
         export CCACHE_DIR="$(realpath ccache)"
         ( cd build && ${{ steps.cmake_installer.outputs.CMAKE_BINARY }} -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DZEEK_AGENT_ENABLE_INSTALL:BOOL=ON -DZEEK_AGENT_ENABLE_TESTS:BOOL=ON -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="3.1" ../ )
 
+#     - name: Build the project
+#       run: |
+#         echo "Clang Version: "
+#         clang --version
+#         sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100
+#         sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
+#         export CCACHE_DIR="$(realpath ccache)"
+#         ( cd build && cmake --build .)
+        
     - name: Build the project
       run: |
         echo "Clang Version: "
@@ -115,10 +171,59 @@ jobs:
         export DESTDIR="$(realpath install)"
         ( cd build && cmake --build . --target install )
 
+#     - name: Configure the packaging project
+#       run: |
+#         export ZEEK_AGENT_INSTALL_PATH="$(realpath install)"
+#         ( cd package && ${{ steps.cmake_installer.outputs.CMAKE_BINARY }} -G Ninja -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="${{ matrix.zeek_version }}" -DZEEK_AGENT_INSTALL_PATH:PATH="${ZEEK_AGENT_INSTALL_PATH}" -DCMAKE_INSTALL_PREFIX:PATH="/usr" ../packaging )
+
     - name: Configure the packaging project
       run: |
         export ZEEK_AGENT_INSTALL_PATH="$(realpath install)"
         ( cd package && ${{ steps.cmake_installer.outputs.CMAKE_BINARY }} -G Ninja -DZEEK_AGENT_ZEEK_COMPATIBILITY:STRING="3.1" -DZEEK_AGENT_INSTALL_PATH:PATH="${ZEEK_AGENT_INSTALL_PATH}" ../ )
+
+#     - name: List items
+#       id: listing
+#       run: |
+#         cd /home/runner/work/zeek-agent/zeek-agent/build
+#         echo "Following Items are present in the build folder"
+#         ls
+#         cd /home/runner/work/zeek-agent/zeek-agent/install
+#         echo "Following Items are present in the install folder"
+#         ls
+#         cd /home/runner/work/zeek-agent/zeek-agent/package
+#         echo "Following Items are present in the package folder"
+#         ls
+#         echo "Clang Version: "
+#         clang --version
+#         echo "libraries of build folder"
+#         cd /home/runner/work/zeek-agent/zeek-agent/build/libraries
+#         ls
+#         echo "libraries of package folder"
+#         cd /home/runner/work/zeek-agent/zeek-agent/package/libraries
+#         ls
+#         echo "openssl of build folder"
+#         cd /home/runner/work/zeek-agent/zeek-agent/build/libraries/openssl
+#         ls
+#         echo "openssl of package folder"
+#         cd /home/runner/work/zeek-agent/zeek-agent/package/libraries/openssl
+#         ls
+#         echo "install of build folder"
+#         cd /home/runner/work/zeek-agent/zeek-agent/build/libraries/openssl/install
+#         ls
+#         echo "install of package folder"
+#         cd /home/runner/work/zeek-agent/zeek-agent/package/libraries/openssl/install
+#         ls
+#         echo "lib64 of build folder"
+#         cd /home/runner/work/zeek-agent/zeek-agent/build/libraries/openssl/install/lib64
+#         ls
+#         echo "lib64 of package folder"
+#         cd /home/runner/work/zeek-agent/zeek-agent/package/libraries/openssl/install/lib64
+#         ls
+    
+#     - name: Build the packages
+#       run: |
+#         export DESTDIR="$(realpath install)"
+#         ( cd build && cmake --build . --target package )
     
     - name: Build the packages
       run: |
@@ -126,6 +231,27 @@ jobs:
         sudo apt-get install zip
         zip -r zeek-agent.zip build/
 
+#     - name: Locate the packages
+#       id: package_locations
+#       run: |
+#         sudo apt-get install zip
+#         cd /home/runner/work/zeek-agent/zeek-agent/build
+#         mkdir temp
+#         cp zeek-agent-0.1.1-Linux.zip temp
+#         cd temp
+#         unzip zeek-agent-0.1.1-Linux.zip
+#         echo "The following files are present inside the zip:"
+#         ls
+#         cd /home/runner/work/zeek-agent/zeek-agent/build
+#         echo "Following Items are present in the build folder"
+#         ls
+#         cd /home/runner/work/zeek-agent/zeek-agent/package
+#         echo "Following Items are present in the package folder"
+#         ls
+#         echo ::set-output name=DEB_PACKAGE_PATH::$(ls package/*.deb)
+#         echo ::set-output name=RPM_PACKAGE_PATH::$(ls package/*.rpm)
+#         echo ::set-output name=TARGZ_PACKAGE_PATH::$(ls package/*.tar.gz)
+    
     - name: Locate the packages
       id: package_locations
       run: |
@@ -154,23 +280,20 @@ jobs:
       run: |
         echo ::set-output name=DEB_PACKAGE_PATH::$(ls linux_deb_package-Release-3.1/*.zip)
         echo ::set-output name=DEB_ASSET_NAME::zeek31_$(cd linux_deb_package-Release-3.1 && ls *.zip)
-        echo ${{ env.UPLOAD_RELEASE }}
         
     - name: Draft the new release
       id: create_release
-      if: ${{ env.UPLOAD_RELEASE == 'true' }}
       uses: actions/create-release@v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Version v1.0.3
-        draft: true
+        release_name: Version ${{ github.ref }}
+        draft: false
         prerelease: false
         
     - name: Upload the Zeek 3.1 .deb package
       id: upload_deb_package_zeek31
-      if: ${{ env.UPLOAD_RELEASE == 'true' }}
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -179,3 +302,154 @@ jobs:
         asset_path: ${{ steps.zeek31_package_locations.outputs.DEB_PACKAGE_PATH }}
         asset_name: ${{ steps.zeek31_package_locations.outputs.DEB_ASSET_NAME }}
         asset_content_type: application/vnd.debian.binary-package
+
+#     - name: Store the .rpm package artifact
+#       uses: actions/upload-artifact@v1
+#       with:
+#         name: linux_rpm_package-${{ matrix.build_type }}-${{ matrix.zeek_version }}
+#         path: ${{ steps.package_locations.outputs.RPM_PACKAGE_PATH }}
+
+#     - name: Store the .tar.gz package artifact
+#       uses: actions/upload-artifact@v1
+#       with:
+#         name: linux_targz_package-${{ matrix.build_type }}-${{ matrix.zeek_version }}
+#         path: ${{ steps.package_locations.outputs.TARGZ_PACKAGE_PATH }}
+
+
+  
+  linux_packaging:
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    needs: linux_build
+    runs-on: ubuntu-20.04
+
+    steps:
+#       - name: Download the DEB package from the linux_build job (Release, Zeek 3.0)
+#         uses: actions/download-artifact@v1
+#         with:
+#           name: linux_deb_package-Release-3.0
+
+#       - name: Download the RPM package from the linux_build job (Release, Zeek 3.0)
+#         uses: actions/download-artifact@v1
+#         with:
+#           name: linux_rpm_package-Release-3.0
+
+#       - name: Download the TARGZ package from the linux_build job (Release, Zeek 3.0)
+#         uses: actions/download-artifact@v1
+#         with:
+#           name: linux_targz_package-Release-3.0
+
+      - name: Download the DEB package from the linux_build job (Release, Zeek 3.1)
+        uses: actions/download-artifact@v1
+        with:
+          name: linux_deb_package-Release-3.1
+
+#       - name: Download the RPM package from the linux_build job (Release, Zeek 3.1)
+#         uses: actions/download-artifact@v1
+#         with:
+#           name: linux_rpm_package-Release-3.1
+
+#       - name: Download the TARGZ package from the linux_build job (Release, Zeek 3.1)
+#         uses: actions/download-artifact@v1
+#         with:
+#           name: linux_targz_package-Release-3.1
+
+#       - name: Locate the Zeek 3.0 packages
+#         id: zeek30_package_locations
+#         run: |
+#           echo ::set-output name=DEB_PACKAGE_PATH::$(ls linux_deb_package-Release-3.0/*.deb)
+#           echo ::set-output name=DEB_ASSET_NAME::zeek30_$(cd linux_deb_package-Release-3.0 && ls *.deb)
+
+#           echo ::set-output name=RPM_PACKAGE_PATH::$(ls linux_rpm_package-Release-3.0/*.rpm)
+#           echo ::set-output name=RPM_ASSET_NAME::zeek30_$(cd linux_rpm_package-Release-3.0 && ls *.rpm)
+
+#           echo ::set-output name=TARGZ_PACKAGE_PATH::$(ls linux_targz_package-Release-3.0/*.tar.gz)
+#           echo ::set-output name=TARGZ_ASSET_NAME::zeek30_$(cd linux_targz_package-Release-3.0 && ls *.tar.gz)
+
+      - name: Locate the Zeek 3.1 packages
+        id: zeek31_package_locations
+        run: |
+          echo ::set-output name=DEB_PACKAGE_PATH::$(ls linux_deb_package-Release-3.1/*.zip)
+          echo ::set-output name=DEB_ASSET_NAME::zeek31_$(cd linux_deb_package-Release-3.1 && ls *.zip)
+
+#          echo ::set-output name=RPM_PACKAGE_PATH::$(ls linux_rpm_package-Release-3.1/*.rpm)
+#         echo ::set-output name=RPM_ASSET_NAME::zeek31_$(cd linux_rpm_package-Release-3.1 && ls *.rpm)
+
+#          echo ::set-output name=TARGZ_PACKAGE_PATH::$(ls linux_targz_package-Release-3.1/*.tar.gz)
+#          echo ::set-output name=TARGZ_ASSET_NAME::zeek31_$(cd linux_targz_package-Release-3.1 && ls *.tar.gz)
+
+      - name: Draft the new release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Version ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+#       - name: Upload the Zeek 3.0 .deb package
+#         id: upload_deb_package_zeek30
+#         uses: actions/upload-release-asset@v1.0.1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           upload_url: ${{ steps.create_release.outputs.upload_url }}
+#           asset_path: ${{ steps.zeek30_package_locations.outputs.DEB_PACKAGE_PATH }}
+#           asset_name: ${{ steps.zeek30_package_locations.outputs.DEB_ASSET_NAME }}
+#           asset_content_type: application/vnd.debian.binary-package
+
+#       - name: Upload the Zeek 3.0 .rpm package
+#         id: upload_rpm_package_zeek30
+#         uses: actions/upload-release-asset@v1.0.1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           upload_url: ${{ steps.create_release.outputs.upload_url }}
+#           asset_path: ${{ steps.zeek30_package_locations.outputs.RPM_PACKAGE_PATH }}
+#           asset_name: ${{ steps.zeek30_package_locations.outputs.RPM_ASSET_NAME }}
+#           asset_content_type: application/x-rpm
+
+#       - name: Upload the Zeek 3.0 .tar.gz package
+#         id: upload_targz_package_zeek30
+#         uses: actions/upload-release-asset@v1.0.1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           upload_url: ${{ steps.create_release.outputs.upload_url }}
+#           asset_path: ${{ steps.zeek30_package_locations.outputs.TARGZ_PACKAGE_PATH }}
+#           asset_name: ${{ steps.zeek30_package_locations.outputs.TARGZ_ASSET_NAME }}
+#           asset_content_type: application/gzip
+
+      - name: Upload the Zeek 3.1 .deb package
+        id: upload_deb_package_zeek31
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.zeek31_package_locations.outputs.DEB_PACKAGE_PATH }}
+          asset_name: ${{ steps.zeek31_package_locations.outputs.DEB_ASSET_NAME }}
+          asset_content_type: application/vnd.debian.binary-package
+
+#       - name: Upload the Zeek 3.1 .rpm package
+#         id: upload_rpm_package_zeek31
+#         uses: actions/upload-release-asset@v1.0.1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           upload_url: ${{ steps.create_release.outputs.upload_url }}
+#           asset_path: ${{ steps.zeek31_package_locations.outputs.RPM_PACKAGE_PATH }}
+#           asset_name: ${{ steps.zeek31_package_locations.outputs.RPM_ASSET_NAME }}
+#           asset_content_type: application/x-rpm
+
+#       - name: Upload the Zeek 3.1 .tar.gz package
+#         id: upload_targz_package_zeek31
+#         uses: actions/upload-release-asset@v1.0.1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           upload_url: ${{ steps.create_release.outputs.upload_url }}
+#           asset_path: ${{ steps.zeek31_package_locations.outputs.TARGZ_PACKAGE_PATH }}
+#           asset_name: ${{ steps.zeek31_package_locations.outputs.TARGZ_ASSET_NAME }}
+#           asset_content_type: application/gzip
